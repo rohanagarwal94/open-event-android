@@ -1,12 +1,14 @@
 package org.fossasia.openevent.data;
 
 import android.database.DatabaseUtils;
+import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
 import org.fossasia.openevent.dbutils.DbContract;
 import org.fossasia.openevent.utils.StringUtils;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -42,7 +44,7 @@ public class Speaker {
     String position;
 
     @SerializedName("sessions")
-    int[] session;
+    List<SpeakerSessions> session;
 
     String country;
 
@@ -50,7 +52,7 @@ public class Speaker {
                    String bio, String email, String web,
                    String twitter, String facebook, String github,
                    String linkedin, String organisation,
-                   String position, int[] session, String country) {
+                   String position,List<SpeakerSessions> session, String country) {
         this.id = id;
         this.name = name;
         this.photo = photo;
@@ -75,11 +77,11 @@ public class Speaker {
         this.name = name;
     }
 
-    public int[] getSession() {
+    public List<SpeakerSessions> getSession() {
         return session;
     }
 
-    public void setSession(int[] session) {
+    public void setSession(List<SpeakerSessions> session) {
         this.session = session;
     }
 
@@ -181,7 +183,7 @@ public class Speaker {
 
     public String generateSql() {
         String query_normal = "INSERT INTO %s VALUES ('%d', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);";
-        return String.format(Locale.ENGLISH,
+        String query =  String.format(Locale.ENGLISH,
                 query_normal,
                 DbContract.Speakers.TABLE_NAME,
                 id,
@@ -197,5 +199,7 @@ public class Speaker {
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(organisation)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(position)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(country)));
+        Log.d("Speakers", query);
+        return query;
     }
 }

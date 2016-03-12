@@ -52,7 +52,7 @@ public class TrackListResponseProcessor implements Callback<TrackResponseList> {
 
     @Override
     public void failure(RetrofitError error) {
-
+Log.d("track", "fail");
         //Post failure on the bus
         OpenEventApp.getEventBus().post(new TracksDownloadEvent(false));
     }

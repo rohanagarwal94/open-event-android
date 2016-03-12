@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,6 +74,7 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
                 String trackTitle = model.getName();
                 Intent intent = new Intent(getContext(), TracksActivity.class);
                 intent.putExtra(IntentStrings.TRACK, trackTitle);
+                Log.d("abc", trackTitle);
                 startActivity(intent);
             }
         });

@@ -35,8 +35,22 @@ import org.fossasia.openevent.OpenEventApp;
 import org.fossasia.openevent.R;
 import org.fossasia.openevent.dbutils.DataDownloadManager;
 import org.fossasia.openevent.dbutils.DbSingleton;
-import org.fossasia.openevent.events.*;
-import org.fossasia.openevent.fragments.*;
+import org.fossasia.openevent.events.CounterEvent;
+import org.fossasia.openevent.events.DataDownloadEvent;
+import org.fossasia.openevent.events.EventDownloadEvent;
+import org.fossasia.openevent.events.MicrolocationDownloadEvent;
+import org.fossasia.openevent.events.NoInternetEvent;
+import org.fossasia.openevent.events.RefreshUiEvent;
+import org.fossasia.openevent.events.SessionDownloadEvent;
+import org.fossasia.openevent.events.ShowNetworkDialogEvent;
+import org.fossasia.openevent.events.SpeakerDownloadEvent;
+import org.fossasia.openevent.events.SponsorDownloadEvent;
+import org.fossasia.openevent.events.TracksDownloadEvent;
+import org.fossasia.openevent.fragments.BookmarksFragment;
+import org.fossasia.openevent.fragments.LocationsFragment;
+import org.fossasia.openevent.fragments.SpeakerFragment;
+import org.fossasia.openevent.fragments.SponsorsFragment;
+import org.fossasia.openevent.fragments.TracksFragment;
 import org.fossasia.openevent.utils.SmoothActionBarDrawerToggle;
 import org.fossasia.openevent.widget.DialogFactory;
 
@@ -326,6 +340,8 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe
     public void onTracksDownloadDone(TracksDownloadEvent event) {
+        Log.d("Tracks", " Done");
+
         if (event.isState()) {
             eventsDone++;
             Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
@@ -333,12 +349,16 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
+            Log.d("Tracks", "Not Done");
+
             downloadFailed();
         }
     }
 
     @Subscribe
     public void onSponsorsDownloadDone(SponsorDownloadEvent event) {
+        Log.d("Sponsors", " Done");
+
         if (event.isState()) {
             eventsDone++;
             Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
@@ -346,6 +366,8 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
+            Log.d("Sponsors", "Not Done");
+
 
             downloadFailed();
         }
@@ -353,6 +375,8 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe
     public void onSpeakersDownloadDone(SpeakerDownloadEvent event) {
+        Log.d("Speaker", " Done");
+
         if (event.isState()) {
             eventsDone++;
             Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
@@ -360,6 +384,7 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
+            Log.d("Speaker", "Not Done");
 
             downloadFailed();
         }
@@ -367,6 +392,8 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe
     public void onSessionDownloadDone(SessionDownloadEvent event) {
+        Log.d("Session", " Done");
+
         if (event.isState()) {
             eventsDone++;
             Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
@@ -374,6 +401,7 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
+            Log.d("Session", "Not Done");
 
             downloadFailed();
         }
@@ -386,6 +414,8 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe
     public void onEventsDownloadDone(EventDownloadEvent event) {
+        Log.d("Event", " Done");
+
         if (event.isState()) {
             eventsDone++;
             Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
@@ -393,6 +423,7 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
+            Log.d("Event", "Not Done");
 
             downloadFailed();
         }
@@ -400,6 +431,8 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe
     public void onMicrolocationsDownloadDone(MicrolocationDownloadEvent event) {
+        Log.d("Micro", " Done");
+
         if (event.isState()) {
             eventsDone++;
             Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
@@ -407,6 +440,7 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
+            Log.d("Micro", "Not Done");
 
             downloadFailed();
         }

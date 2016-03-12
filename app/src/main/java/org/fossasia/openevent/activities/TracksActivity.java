@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +25,8 @@ import org.fossasia.openevent.data.Session;
 import org.fossasia.openevent.data.Track;
 import org.fossasia.openevent.dbutils.DbSingleton;
 import org.fossasia.openevent.utils.IntentStrings;
+
+import timber.log.Timber;
 
 /**
  * User: MananWason
@@ -51,6 +54,8 @@ public class TracksActivity extends BaseActivity implements SearchView.OnQueryTe
         setContentView(R.layout.activity_tracks);
         DbSingleton dbSingleton = DbSingleton.getInstance();
         track = getIntent().getStringExtra(IntentStrings.TRACK);
+        Log.d("abc", track);
+
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -66,11 +71,12 @@ public class TracksActivity extends BaseActivity implements SearchView.OnQueryTe
         sessionsListAdapter.setOnClickListener(new SessionsListAdapter.SetOnClickListener() {
             @Override
             public void onItemClick(int position, View view) {
-                Session model = (Session) sessionsListAdapter.getItem(position);
+                Session model =  sessionsListAdapter.getItem(position);
                 String sessionName = model.getTitle();
                 Intent intent = new Intent(getApplicationContext(), SessionDetailActivity.class);
                 intent.putExtra(IntentStrings.SESSION, sessionName);
                 intent.putExtra(IntentStrings.TRACK, track);
+                Timber.tag(TAG).d(sessionName + " " +track);
                 startActivity(intent);
             }
         });

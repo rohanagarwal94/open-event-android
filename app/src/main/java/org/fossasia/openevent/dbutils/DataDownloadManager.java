@@ -26,7 +26,7 @@ public final class DataDownloadManager {
     }
 
     public void downloadEvents() {
-        client.getOpenEventAPI().getEvents(new EventListResponseProcessor());
+        client.getOpenEventAPI().getEvents(Urls.EVENT_ID, new EventListResponseProcessor());
     }
 
     public void downloadSpeakers() {

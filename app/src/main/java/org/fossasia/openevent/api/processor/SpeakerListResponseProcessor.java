@@ -30,11 +30,14 @@ public class SpeakerListResponseProcessor implements Callback<SpeakerResponseLis
         CommonTaskLoop.getInstance().post(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "for1");
+
                 ArrayList<String> queries = new ArrayList<String>();
 
                 for (Speaker speaker : speakerResponseList.speakers) {
-                    for (int i = 0; i < speaker.getSession().length; i++) {
-                        SessionSpeakersMapping sessionSpeakersMapping = new SessionSpeakersMapping(speaker.getSession()[i], speaker.getId());
+                    Log.d(TAG, "for");
+                    for (int i = 0; i < speaker.getSession().size(); i++) {
+                        SessionSpeakersMapping sessionSpeakersMapping = new SessionSpeakersMapping(speaker.getSession().get(i).getId(), speaker.getId());
                         String query_ss = sessionSpeakersMapping.generateSql();
                         queries.add(query_ss);
                     }
@@ -56,6 +59,8 @@ public class SpeakerListResponseProcessor implements Callback<SpeakerResponseLis
 
     @Override
     public void failure(RetrofitError error) {
+        Log.d(TAG, error.toString());
+
         // Do something with failure, raise an event etc.
         OpenEventApp.getEventBus().post(new SpeakerDownloadEvent(false));
     }
