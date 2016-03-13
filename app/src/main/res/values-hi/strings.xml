@@ -32,5 +32,8 @@
     <string name="ok">ठीक है!</string>
     <string name="turn_on"> सेटिंग्स में वाईफाई या मोबाइल डेटा को चालू करें</string>
     <string name="invalid_url">अवैध यूआरएल</string>
+    <string name="cancel">Cancel</string>
+    <string name="empty_list">No Bookmarks Available</string>
+
 
 </resources>

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="mode_strings">
+    <string-array name="mode_strings" translatable="false">
         <item>User</item>
         <item>Developer</item>
     </string-array>
-    <string-array name="mode_values">
+    <string-array name="mode_values" translatable="false">
         <item>1 </item>
         <item>2</item>
     </string-array>
-    <string-array name="notification_mode_strings">
+    <string-array name="notification_mode_strings" translatable="false">
         <item>10 mins</item>
         <item>1 Hour</item>
         <item>12 Hour</item>
     </string-array>
-    <string-array name="notification_mode_values">
+    <string-array name="notification_mode_values" translatable="false">
         <item>10 </item>
         <item>1</item>
         <item>12</item>

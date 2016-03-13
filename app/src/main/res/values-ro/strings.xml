@@ -47,4 +47,7 @@
     <string name="cancel">Inchide</string>
     <string name="error">Erore</string>
     <string name="ok">OK</string>
+    <string name="empty_list">No Bookmarks Available</string>
+    <string name="invalid_url">Invalid Url</string>
+
 </resources>
