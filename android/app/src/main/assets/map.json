@@ -1,133 +1,142 @@
 {
 "map":
 [
-
- {
-"title": "OAT",
-"subtitle": "",
-"floor": "0",
-"type": "",
-   "latitude": "52.51420",
-   "longitude": "13.388898"
-},
-
-
   {
-    "title": "TW4GF1",
-    "subtitle": "",
-    "floor": "3",
-    "type": "",
-    "latitude": "52.5220",
-    "longitude": "13.386898"
+    "floor": 3,
+    "id": 1,
+    "latitude": null,
+    "longitude": null,
+    "name": "Dalton Hall",
+    "room": null
   },
-
-{
-"title": "SBGF1",
-"subtitle": "Chemistry Lab",
-"floor": "0",
- "latitude": "52.52434",
- "longitude": "13.389693"
-},
-
-{
-"title": "SBGF2",
-"subtitle": "Processing Lab",
-"floor": "0",
-"type": "",
-  "latitude": "52.52436",
-  "longitude": "13.387893"
-},
-
-{
-"title": "SBGF3",
-"subtitle": "Polymer Testing Lab",
-"floor": "0",
-"type": "",
-  "latitude": "52.52410",
-  "longitude": "13.388808"
-},
-
-{
-"title": "SBGF4",
-"subtitle": "Instrumentation Lab",
-"floor": "2",
-"type": "",
-  "latitude": "52.52120",
-  "longitude": "13.382898"
-},
-
-{
-"title": "SBGF5",
-"subtitle": "M.E. Lab",
-"floor": "1",
-"type": "",
-  "latitude": "52.52439",
-  "longitude": "13.388393"
-},
-
-{
-"title": "Ladies Washroom(Science Block)",
-"subtitle": "",
-"floor": "3",
-"type": "",
-  "latitude": "52.52420",
-  "longitude": "13.388898"
-},
-
-{
-"title": "SBGF5",
-"subtitle": "M.E. Lab",
-"floor": "2",
-"type": "",
-  "latitude": "52.52400",
-  "longitude": "13.388808"
-},
-
-
-{
-"title": "SBGF8",
-"subtitle": "",
-"floor": "1",
-"type": "",
-  "latitude": "52.52320",
-  "longitude": "13.388198"
-},
-
-{
-"title": "SBGF9",
-"subtitle": "",
-"floor": "3",
-"type": "",
-  "latitude": "52.52400",
-  "longitude": "13.388800"
-},
-
-{
-"title": "SBGF10",
-"subtitle": "",
-"floor": "1",
-"type": "",
-  "latitude": "52.52300",
-  "longitude": "13.386898"
-},
-
-{
-"title": "TW4GF2",
-"subtitle": "",
-"floor": "2",
-"type": "",
-  "latitude": "52.52415",
-  "longitude": "13.388898"
-},
-
-{
-"title": "TW4GF3",
-"subtitle": "",
-"floor": "0",
-"type": "",
-  "latitude": "52.52414",
-  "longitude": "13.388390"
-}
+  {
+    "floor": 3,
+    "id": 2,
+    "latitude": null,
+    "longitude": null,
+    "name": "Lewis Lab",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 3,
+    "latitude": null,
+    "longitude": null,
+    "name": "Digital Design Studio",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 4,
+    "latitude": null,
+    "longitude": null,
+    "name": "Digital Design Studio",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 5,
+    "latitude": null,
+    "longitude": null,
+    "name": "Observatory Room",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 6,
+    "latitude": null,
+    "longitude": null,
+    "name": "Eco Garden Lab",
+    "room": null
+  },
+  {
+    "floor": 3,
+    "id": 7,
+    "latitude": null,
+    "longitude": null,
+    "name": "Planck Lab",
+    "room": null
+  },
+  {
+    "floor": 3,
+    "id": 8,
+    "latitude": null,
+    "longitude": null,
+    "name": "Faraday Lab",
+    "room": null
+  },
+  {
+    "floor": 3,
+    "id": 9,
+    "latitude": null,
+    "longitude": null,
+    "name": "Pauling Lab",
+    "room": null
+  },
+  {
+    "floor": 3,
+    "id": 10,
+    "latitude": null,
+    "longitude": null,
+    "name": "Fermi Lab",
+    "room": null
+  },
+  {
+    "floor": 2,
+    "id": 11,
+    "latitude": null,
+    "longitude": null,
+    "name": "Herschel Lab",
+    "room": null
+  },
+  {
+    "floor": 2,
+    "id": 12,
+    "latitude": null,
+    "longitude": null,
+    "name": "Einstein Room",
+    "room": null
+  },
+  {
+    "floor": 2,
+    "id": 13,
+    "latitude": null,
+    "longitude": null,
+    "name": "Einstein Hall",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 14,
+    "latitude": null,
+    "longitude": null,
+    "name": "Tinkering Studio",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 15,
+    "latitude": null,
+    "longitude": null,
+    "name": "Observatory Room",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 16,
+    "latitude": null,
+    "longitude": null,
+    "name": "Eco Garden Lab",
+    "room": null
+  },
+  {
+    "floor": 1,
+    "id": 17,
+    "latitude": null,
+    "longitude": null,
+    "name": "Ground Floor, Scientist For a day, Hall A",
+    "room": null
+  }
 ]
 }
 
