@@ -7,8 +7,8 @@
 "subtitle": "",
 "floor": "0",
 "type": "",
-"latitude": "52.52433",
-"longitude": "13.389893"
+   "latitude": "52.51420",
+   "longitude": "13.388898"
 },
 
 
@@ -17,8 +17,8 @@
     "subtitle": "",
     "floor": "3",
     "type": "",
-    "latitude": "52.52434",
-    "longitude": "13.3897012"
+    "latitude": "52.5220",
+    "longitude": "13.386898"
   },
 
 {
@@ -43,8 +43,8 @@
 "subtitle": "Polymer Testing Lab",
 "floor": "0",
 "type": "",
-  "latitude": "52.52434",
-  "longitude": "13.379897"
+  "latitude": "52.52410",
+  "longitude": "13.388808"
 },
 
 {
@@ -52,8 +52,8 @@
 "subtitle": "Instrumentation Lab",
 "floor": "2",
 "type": "",
-  "latitude": "52.52434",
-  "longitude": "13.389693"
+  "latitude": "52.52120",
+  "longitude": "13.382898"
 },
 
 {
@@ -68,7 +68,7 @@
 {
 "title": "Ladies Washroom(Science Block)",
 "subtitle": "",
-"floor": "10.0",
+"floor": "3",
 "type": "",
   "latitude": "52.52420",
   "longitude": "13.388898"
@@ -79,8 +79,8 @@
 "subtitle": "M.E. Lab",
 "floor": "2",
 "type": "",
-  "latitude": "52.52434",
-  "longitude": "13.3858912"
+  "latitude": "52.52400",
+  "longitude": "13.388808"
 },
 
 
@@ -89,8 +89,8 @@
 "subtitle": "",
 "floor": "1",
 "type": "",
-  "latitude": "52.52434",
-  "longitude": "13.38980129"
+  "latitude": "52.52320",
+  "longitude": "13.388198"
 },
 
 {
@@ -98,8 +98,8 @@
 "subtitle": "",
 "floor": "3",
 "type": "",
-  "latitude": "52.52444",
-  "longitude": "13.3898312"
+  "latitude": "52.52400",
+  "longitude": "13.388800"
 },
 
 {
@@ -107,8 +107,8 @@
 "subtitle": "",
 "floor": "1",
 "type": "",
-  "latitude": "52.52434",
-  "longitude": "13.3896952"
+  "latitude": "52.52300",
+  "longitude": "13.386898"
 },
 
 {
@@ -116,8 +116,8 @@
 "subtitle": "",
 "floor": "2",
 "type": "",
-  "latitude": "52.52434",
-  "longitude": "13.3898972"
+  "latitude": "52.52415",
+  "longitude": "13.388898"
 },
 
 {
@@ -125,8 +125,8 @@
 "subtitle": "",
 "floor": "0",
 "type": "",
-  "latitude": "52.53434",
-  "longitude": "13.3898912"
+  "latitude": "52.52414",
+  "longitude": "13.388390"
 }
 ]
 }

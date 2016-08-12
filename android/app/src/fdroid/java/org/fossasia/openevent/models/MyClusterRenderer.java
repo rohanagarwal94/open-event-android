@@ -24,8 +24,6 @@ public class MyClusterRenderer extends DefaultClusterRenderer<MarkerItem> {
 
         markerOptions.title(item.getTitle());
         markerOptions.snippet(item.getsubtitle());
-        markerOptions.zIndex(item.getfloor());
-
     }
 
     @Override

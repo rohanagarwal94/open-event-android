@@ -31,7 +31,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import org.fossasia.openevent.R;
 import org.fossasia.openevent.models.MyClusterRenderer;
 import org.fossasia.openevent.models.MarkerItem;
-import org.fossasia.openevent.models.getmarkerfromstring;
+import org.fossasia.openevent.models.getMarkerFromString;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,18 +43,20 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback{
 
     private static final int REQUEST_MAP_LOCATION = 100;
     private static final double DESTINATION_LATITUDE = 52.52433;
     private static final double DESTINATION_LONGITUDE = 13.389893;
+    private static final int MAXLEVEL=3;
 
     private AutoCompleteTextView actv;
     private List<MarkerItem> markerItems = new ArrayList<>();
     private String jsonString;
-    private ArrayList<getmarkerfromstring> markerList = new ArrayList<>();
+    private ArrayList<getMarkerFromString> markerList = new ArrayList<>();
     private List<String> actvItems = new ArrayList<>();
     private GoogleMap mMap;
+    private ClusterManager<MarkerItem> clusterManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -108,15 +110,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnIndoorStateChangeListener(new GoogleMap.OnIndoorStateChangeListener() {
             @Override
             public void onIndoorBuildingFocused() {
-                Toast.makeText(getActivity(),"rere",Toast.LENGTH_SHORT).show();
+                if(mMap.getFocusedBuilding()==null)
+                {
+                    clusterManager.clearItems();
+                    clusterManager.addItems(markerItems);
+                    clusterManager.setRenderer(new MyClusterRenderer(getActivity(), mMap, clusterManager));
+                }
             }
 
             @Override
             public void onIndoorLevelActivated(IndoorBuilding indoorBuilding) {
-
-                Toast.makeText(getActivity(),"rere",Toast.LENGTH_SHORT).show();
+                if (indoorBuilding != null) {
+                    IndoorLevel level =
+                            indoorBuilding.getLevels().get(indoorBuilding.getActiveLevelIndex());
+                    if (level != null) {
+                        clusterManager.clearItems();
+                        int currentLevel = MAXLEVEL-indoorBuilding.getActiveLevelIndex();
+                        List<MarkerItem> currentLevelMarkerItems = new ArrayList<>();
+                        for (MarkerItem markerItem : markerItems) {
+                            if (markerItem.getfloor() == currentLevel) {
+                                currentLevelMarkerItems.add(markerItem);
+                            }
+                        }
+                        clusterManager.addItems(currentLevelMarkerItems);
+                        clusterManager.setRenderer(new MyClusterRenderer(getActivity(), mMap, clusterManager));
+                    }
+                }
+                else
+                {
+                    clusterManager.clearItems();
+                    clusterManager.addItems(markerItems);
+                    clusterManager.setRenderer(new MyClusterRenderer(getActivity(), mMap, clusterManager));
+                }
             }
         });
+
 
     }
 
@@ -131,12 +159,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     REQUEST_MAP_LOCATION);
         }
-        final ClusterManager<MarkerItem> mClusterManager = new ClusterManager<>(getActivity(), mMap);
-        initCamera();
-        mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
 
-        mClusterManager
+        initCamera();
+        clusterManager = new ClusterManager<>(getActivity(), mMap);
+        mMap.setOnCameraChangeListener(clusterManager);
+        mMap.setOnMarkerClickListener(clusterManager);
+
+        clusterManager
                 .setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MarkerItem>() {
                     @Override
                     public boolean onClusterClick(final Cluster<MarkerItem> cluster) {
@@ -176,35 +205,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             for (int i = 0; i < arraylength; i++) {
 
                 JSONObject jsonChildNode = jsonArray.getJSONObject(i);
-                String title = jsonChildNode.optString("title");
-                String subtitle = jsonChildNode.optString("subtitle");
-                float floor = jsonChildNode.optInt("floor");
+                String title = jsonChildNode.optString("name");
+                String subtitle = jsonChildNode.optString("room");
+                int floor = jsonChildNode.optInt("floor");
                 double lat1 = jsonChildNode.optDouble("latitude");
                 double lng1 = jsonChildNode.optDouble("longitude");
                 markerItems.add(new MarkerItem(lat1, lng1, title, subtitle, floor));
                 actvItems.add(title);
-                actvItems.add(subtitle);
-                getmarkerfromstring user = new getmarkerfromstring();
+                getMarkerFromString user = new getMarkerFromString();
                 user.setLat(lat1);
                 user.setLng(lng1);
                 user.setName(title);
                 markerList.add(user);
-                getmarkerfromstring user2 = new getmarkerfromstring();
-                user2.setLat(lat1);
-                user2.setLng(lng1);
-                user2.setName(subtitle);
-                markerList.add(user2);
 
             }
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-            mClusterManager.addItems(markerItems);
-            mClusterManager.setRenderer(new MyClusterRenderer(getActivity(), mMap, mClusterManager));
-            mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerItem>() {
+            clusterManager.addItems(markerItems);
+            clusterManager.setRenderer(new MyClusterRenderer(getActivity(), mMap, clusterManager));
+            clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerItem>() {
                 @Override
                 public boolean onClusterItemClick(MarkerItem markerItem) {
-                    Toast.makeText(getActivity(), markerItem.getfloor() + " floor", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             });

@@ -12,9 +12,9 @@ public class MarkerItem implements ClusterItem {
     private final LatLng mPosition;
     private String title;
     private String subtitle;
-    private float floor;
+    private int floor;
 
-    public MarkerItem(double lat, double lng, String stitle, String ssubtitle, float sfloor ) {
+    public MarkerItem(double lat, double lng, String stitle, String ssubtitle, int sfloor ) {
 
         mPosition = new LatLng(lat, lng);
         title=stitle;
@@ -31,7 +31,7 @@ public class MarkerItem implements ClusterItem {
         return subtitle;
     }
 
-    public float getfloor() {
+    public int getfloor() {
         return floor;
     }
 
