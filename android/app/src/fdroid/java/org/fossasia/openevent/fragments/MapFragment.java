@@ -29,7 +29,7 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.fossasia.openevent.R;
-import org.fossasia.openevent.models.MyClusterRenderer;
+import org.fossasia.openevent.utils.MyClusterRenderer;
 import org.fossasia.openevent.models.MarkerItem;
 import org.fossasia.openevent.models.getMarkerFromString;
 import org.json.JSONArray;

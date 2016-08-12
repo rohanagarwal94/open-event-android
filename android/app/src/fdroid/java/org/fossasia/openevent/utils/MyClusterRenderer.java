@@ -1,4 +1,4 @@
-package org.fossasia.openevent.models;
+package org.fossasia.openevent.utils;
 
 import android.content.Context;
 
@@ -7,6 +7,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
+import org.fossasia.openevent.models.MarkerItem;
 
 /**
  * Created by rohanagarwal94 on 11/8/16.
