@@ -31,7 +31,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import org.fossasia.openevent.R;
 import org.fossasia.openevent.utils.MyClusterRenderer;
 import org.fossasia.openevent.models.MarkerItem;
-import org.fossasia.openevent.models.getMarkerFromString;
+import org.fossasia.openevent.models.GetMarkerFromString;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +53,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     private AutoCompleteTextView actv;
     private List<MarkerItem> markerItems = new ArrayList<>();
     private String jsonString;
-    private ArrayList<getMarkerFromString> markerList = new ArrayList<>();
+    private ArrayList<GetMarkerFromString> markerList = new ArrayList<>();
     private List<String> actvItems = new ArrayList<>();
     private GoogleMap mMap;
     private ClusterManager<MarkerItem> clusterManager;
@@ -217,7 +217,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                 double lng1 = jsonChildNode.optDouble("longitude");
                 markerItems.add(new MarkerItem(lat1, lng1, title, subtitle, floor));
                 actvItems.add(title);
-                getMarkerFromString user = new getMarkerFromString();
+                GetMarkerFromString user = new GetMarkerFromString();
                 user.setLat(lat1);
                 user.setLng(lng1);
                 user.setName(title);

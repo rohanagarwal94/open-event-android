@@ -3,7 +3,7 @@ package org.fossasia.openevent.models;
 /**
  * Created by rohanagarwal94 on 10/8/16.
  */
-public class getMarkerFromString {
+public class GetMarkerFromString {
     private double lat;
     private double lng;
     private String name;
