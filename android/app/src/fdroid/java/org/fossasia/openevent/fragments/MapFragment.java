@@ -217,11 +217,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                 double lng1 = jsonChildNode.optDouble("longitude");
                 markerItems.add(new MarkerItem(lat1, lng1, title, subtitle, floor));
                 actvItems.add(title);
-                GetMarkerFromString user = new GetMarkerFromString();
-                user.setLat(lat1);
-                user.setLng(lng1);
-                user.setName(title);
-                markerList.add(user);
+                GetMarkerFromString markerFromString = new GetMarkerFromString();
+                markerFromString.setLat(lat1);
+                markerFromString.setLng(lng1);
+                markerFromString.setName(title);
+                markerList.add(markerFromString);
 
             }
                     getActivity().runOnUiThread(new Runnable() {
