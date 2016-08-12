@@ -1,0 +1,134 @@
+{
+"map":
+[
+
+ {
+"title": "OAT",
+"subtitle": "",
+"floor": "0",
+"type": "",
+"latitude": "52.52433",
+"longitude": "13.389893"
+},
+
+
+  {
+    "title": "TW4GF1",
+    "subtitle": "",
+    "floor": "3",
+    "type": "",
+    "latitude": "52.52434",
+    "longitude": "13.3897012"
+  },
+
+{
+"title": "SBGF1",
+"subtitle": "Chemistry Lab",
+"floor": "0",
+ "latitude": "52.52434",
+ "longitude": "13.389693"
+},
+
+{
+"title": "SBGF2",
+"subtitle": "Processing Lab",
+"floor": "0",
+"type": "",
+  "latitude": "52.52436",
+  "longitude": "13.387893"
+},
+
+{
+"title": "SBGF3",
+"subtitle": "Polymer Testing Lab",
+"floor": "0",
+"type": "",
+  "latitude": "52.52434",
+  "longitude": "13.379897"
+},
+
+{
+"title": "SBGF4",
+"subtitle": "Instrumentation Lab",
+"floor": "2",
+"type": "",
+  "latitude": "52.52434",
+  "longitude": "13.389693"
+},
+
+{
+"title": "SBGF5",
+"subtitle": "M.E. Lab",
+"floor": "1",
+"type": "",
+  "latitude": "52.52439",
+  "longitude": "13.388393"
+},
+
+{
+"title": "Ladies Washroom(Science Block)",
+"subtitle": "",
+"floor": "10.0",
+"type": "",
+  "latitude": "52.52420",
+  "longitude": "13.388898"
+},
+
+{
+"title": "SBGF5",
+"subtitle": "M.E. Lab",
+"floor": "2",
+"type": "",
+  "latitude": "52.52434",
+  "longitude": "13.3858912"
+},
+
+
+{
+"title": "SBGF8",
+"subtitle": "",
+"floor": "1",
+"type": "",
+  "latitude": "52.52434",
+  "longitude": "13.38980129"
+},
+
+{
+"title": "SBGF9",
+"subtitle": "",
+"floor": "3",
+"type": "",
+  "latitude": "52.52444",
+  "longitude": "13.3898312"
+},
+
+{
+"title": "SBGF10",
+"subtitle": "",
+"floor": "1",
+"type": "",
+  "latitude": "52.52434",
+  "longitude": "13.3896952"
+},
+
+{
+"title": "TW4GF2",
+"subtitle": "",
+"floor": "2",
+"type": "",
+  "latitude": "52.52434",
+  "longitude": "13.3898972"
+},
+
+{
+"title": "TW4GF3",
+"subtitle": "",
+"floor": "0",
+"type": "",
+  "latitude": "52.53434",
+  "longitude": "13.3898912"
+}
+]
+}
+
+

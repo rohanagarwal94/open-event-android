@@ -70,6 +70,10 @@
     <string name="fmt_floor">"Floor : "</string>
     <string name="noBookmark">No bookmarked session yet !!</string>
 
+    <!--Map-->
+    <string name="location_permission_denied">Location Permission Denied</string>
+    <string name="failure_json">Failure in JSON</string>
+
     <!--About us text-->
     <string name="about_text">Programmed by <a href="https://github.com/fossasia/open-event-android/graphs/contributors">FOSSASIA contributors</a>.
 \n

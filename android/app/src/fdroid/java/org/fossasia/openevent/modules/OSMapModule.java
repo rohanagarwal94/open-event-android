@@ -2,9 +2,7 @@ package org.fossasia.openevent.modules;
 
 import android.support.v4.app.Fragment;
 
-import org.fossasia.openevent.fragments.OSMapFragment;
-
-
+import org.fossasia.openevent.fragments.MapFragment;
 /**
  * User: mohit
  * Date: 13/6/15
@@ -12,6 +10,6 @@ import org.fossasia.openevent.fragments.OSMapFragment;
 public class OSMapModule implements MapModule {
     @Override
     public Fragment provideMapFragment() {
-        return new OSMapFragment();
+        return new MapFragment();
     }
 }
