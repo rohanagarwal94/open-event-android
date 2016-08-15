@@ -4,9 +4,11 @@ import android.database.DatabaseUtils;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.fossasia.openevent.api.Urls;
 import org.fossasia.openevent.dbutils.DbContract;
 import org.fossasia.openevent.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -22,12 +24,12 @@ public class Speaker {
 
     String photo;
 
-    @SerializedName("biography")
+    @SerializedName("long_biography")
     String bio;
 
     String email;
 
-    String web;
+    String website;
 
     String twitter;
 
@@ -42,7 +44,8 @@ public class Speaker {
     String position;
 
     @SerializedName("sessions")
-    int[] session;
+    ArrayList<Session> sessionArrayList;
+
 
     String country;
 
@@ -53,17 +56,16 @@ public class Speaker {
                    String position, int[] session, String country) {
         this.id = id;
         this.name = name;
-        this.photo = photo;
+        this.photo = Urls.BASE_URL + photo;
         this.bio = bio;
         this.email = email;
-        this.web = web;
+        this.website = web;
         this.twitter = twitter;
         this.facebook = facebook;
         this.github = github;
         this.linkedin = linkedin;
         this.organisation = organisation;
         this.position = position;
-        this.session = session;
         this.country = country;
     }
 
@@ -75,12 +77,12 @@ public class Speaker {
         this.name = name;
     }
 
-    public int[] getSession() {
-        return session;
+    public ArrayList<Session> getSession() {
+        return sessionArrayList;
     }
 
-    public void setSession(int[] session) {
-        this.session = session;
+    public void setSession(ArrayList<Session> session) {
+        this.sessionArrayList = session;
     }
 
     public String getPhoto() {
@@ -107,12 +109,12 @@ public class Speaker {
         this.email = email;
     }
 
-    public String getWeb() {
-        return web;
+    public String getWebsite() {
+        return website;
     }
 
-    public void setWeb(String web) {
-        this.web = web;
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public String getTwitter() {
@@ -189,7 +191,7 @@ public class Speaker {
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(photo)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(bio)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(email)),
-                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(web)),
+                DatabaseUtils.sqlEscapeString(StringUtils.optionalString(website)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(facebook)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(twitter)),
                 DatabaseUtils.sqlEscapeString(StringUtils.optionalString(github)),

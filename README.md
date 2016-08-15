@@ -10,26 +10,43 @@
 
 Open Event Android consists of 2 main parts : <br>
 
-1. [App Generator](https://github.com/fossasia/open-event-android/blob/master/docs/ApkGenerator.md) hosted on a server
-2. [Android client](https://github.com/fossasia/open-event-android/blob/master/docs/AndroidApp.md) that is can be installed on any Android device for browsing any event
+1. [App Generator](https://github.com/fossasia/open-event-android/tree/development/apk-generator) hosted on [DigitalOcean](https://www.digitalocean.com/).
+2. [Android client](https://github.com/fossasia/open-event-android/tree/development/android) that is can be installed on any Android device for browsing any event
 
-Follow the HyperLinks above for documentation on how to setup the server and android app.
+##Using the App Generator
+The app generator can be accessed in 2 ways,
 
-###Video Walkthrough
+###[Via the App Genrator Web-Page](http://192.241.232.231/)
+Runs on an APACHE server hosted on DigitalOcean.
+
+###[Via POST API](http://192.241.232.231/api/api.php)
+The POST API takes input in form of a JSON and then creates and emails you the app.<br>
+
+Sending a POST Request <br>
+
+You can use [Postman](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) for Chrome or [RESTClient](https://addons.mozilla.org/de/firefox/addon/restclient/) for Firefox for making API calls easily.
+
+Input to the API should be of the following format <br>
+```{ "email": "example@example.com", "app_name": "Name", "endpoint": "http://valid-endpoint.com/" } ```<br>
+
+After taking the request through the POST API, the app will be generated and emailed to the email address provided in the request body.
+
+## Maintainers
+The project is maintained by
+- Harshit Dwivedi ([@the-dagger](https://github.com/the-dagger))
+- Manan Wason ([@mananwason](https://github.com/mananwason))
+- Mario Behling ([@mariobehling](http://github.com/mariobehling))
+- Justin Lee ([@juslee](http://github.com/juslee))
+
+##Video Walkthrough
 [![FOSSASIA](https://img.youtube.com/vi/n5G4yw3t--U/0.jpg)](https://www.youtube.com/watch?v=n5G4yw3t--U)
 
-### Screenshots  
-![alt-tag](android/screenshots/ss2.PNG)
-
-![alt-tag](android/screenshots/ss1.PNG)
-
-![alt-tag](android/screenshots/ss3.PNG)
-
-![alt-tag](android/screenshots/ss4.PNG)
+## Screenshots  
+![alt-tag](docs/screenshots/ss.png)
 
 ## Documentation
 
-You can find the apk generator docs [here](docs/AndroidApp.md) and the android app docs [here](docs/ApkGenerator.md)
+You can find the apk generator docs [here](docs/ApkGenerator.md) and the android app docs [here](docs/AndroidApp.md)
 
 ## Branches and Contribution policy
 We have the following branches   
@@ -42,7 +59,7 @@ We have the following branches
 	 All tagged commits on _master_ branch will automatically generate a release on Github with a copy of ***fDroid-debug*** and ***GooglePlay-debug*** apks.
 
 ## A note about Codestyle
-Please read our [CODESTYLE](CODESTYLE.md) carefully. Pull requests that do not match the style will be rejected.
+Please read our [CODESTYLE](docs/CODESTYLE.md) carefully. Pull requests that do not match the style will be rejected.
 
 ## License
-This project is currently licensed under the GNU General Public License v3. A copy of LICENSE.md should be present along with the source code. To obtain the software under a different license, please contact FOSSASIA.
+This project is currently licensed under the GNU General Public License v3. A copy of [LICENSE](LICENSE.md) is to be present along with the source code. To obtain the software under a different license, please contact FOSSASIA.
