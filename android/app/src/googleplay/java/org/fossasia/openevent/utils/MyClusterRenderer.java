@@ -8,28 +8,29 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-import org.fossasia.openevent.models.MarkerItem;
+import org.fossasia.openevent.data.Microlocation;
+
 
 /**
  * Created by rohanagarwal94 on 11/8/16.
  */
-public class MyClusterRenderer extends DefaultClusterRenderer<MarkerItem> {
+public class MyClusterRenderer extends DefaultClusterRenderer<Microlocation> {
 
     public MyClusterRenderer(Context context, GoogleMap map,
-                             ClusterManager<MarkerItem> clusterManager) {
+                             ClusterManager<Microlocation> clusterManager) {
         super(context, map, clusterManager);
     }
 
     @Override
-    protected void onBeforeClusterItemRendered(MarkerItem item, MarkerOptions markerOptions) {
+    protected void onBeforeClusterItemRendered(Microlocation item, MarkerOptions markerOptions) {
         super.onBeforeClusterItemRendered(item, markerOptions);
 
-        markerOptions.title(item.getTitle());
-        markerOptions.snippet(item.getsubtitle());
+        markerOptions.title(item.getName());
+        markerOptions.snippet(String.valueOf("Floor" + item.getFloor()));
     }
 
     @Override
-    protected void onClusterItemRendered(final MarkerItem clusterItem, Marker marker) {
+    protected void onClusterItemRendered(final Microlocation clusterItem, Marker marker) {
         super.onClusterItemRendered(clusterItem, marker);
     }
 

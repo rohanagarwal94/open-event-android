@@ -2,7 +2,7 @@ package org.fossasia.openevent.modules;
 
 import android.support.v4.app.Fragment;
 
-import org.fossasia.openevent.fragments.MapFragment;
+import org.fossasia.openevent.fragments.MapsFragment;
 
 /**
  * User: mohit
@@ -14,6 +14,6 @@ public class GoogleMapModule implements MapModule {
      */
     @Override
     public Fragment provideMapFragment() {
-        return new MapFragment();
+        return new MapsFragment();
     }
 }
