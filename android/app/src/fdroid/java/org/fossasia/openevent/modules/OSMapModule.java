@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 
 import org.fossasia.openevent.fragments.OSMapFragment;
 
+
 /**
  * User: mohit
  * Date: 13/6/15

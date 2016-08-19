@@ -26,7 +26,7 @@ public class MyClusterRenderer extends DefaultClusterRenderer<Microlocation> {
         super.onBeforeClusterItemRendered(item, markerOptions);
 
         markerOptions.title(item.getName());
-        markerOptions.snippet(String.valueOf("Floor" + item.getFloor()));
+        markerOptions.snippet(String.valueOf("Floor " + item.getFloor()));
     }
 
     @Override

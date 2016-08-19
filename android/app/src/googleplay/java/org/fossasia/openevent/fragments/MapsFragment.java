@@ -38,8 +38,8 @@ import java.util.List;
 public class MapsFragment extends Fragment
         implements OnMapReadyCallback {
 
-    private static final double DESTINATION_LATITUDE = 52.52433;
-    private static final double DESTINATION_LONGITUDE = 13.389893;
+    private static final double DESTINATION_LATITUDE = 1.3327941;
+    private static final double DESTINATION_LONGITUDE = 103.7354777;
     private static final int MAXLEVEL = 3;
 
     private AutoCompleteTextView actv;

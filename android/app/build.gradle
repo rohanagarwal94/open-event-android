@@ -90,8 +90,6 @@ dependencies {
     googleplayCompile 'com.google.android.gms:play-services-location:9.2.0'
     googleplayCompile 'com.google.maps.android:android-maps-utils:0.3+'
 
-
-
     // Fdroid Variant
     fdroidCompile 'org.osmdroid:osmdroid-android:5.1'
     fdroidCompile 'org.apache.directory.studio:org.slf4j.api:1.7.2'
