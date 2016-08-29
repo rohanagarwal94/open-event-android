@@ -3,6 +3,7 @@ package org.fossasia.openevent.utils;
 import android.content.Context;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
@@ -29,14 +30,13 @@ public class MyClusterRenderer extends DefaultClusterRenderer<Microlocation> {
         super.onBeforeClusterItemRendered(item, markerOptions);
 
         markerOptions.title(item.getName());
-        markerOptions.snippet(String.valueOf(context.getResources().getString(R.string.floor) + item.getFloor()));
+        markerOptions.snippet(String.valueOf(context.getResources().getString(R.string.floor) + " " + item.getFloor()));
+        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_unselected));
     }
 
     @Override
     protected void onClusterItemRendered(final Microlocation clusterItem, Marker marker) {
         super.onClusterItemRendered(clusterItem, marker);
     }
-
-
 
 }

@@ -19,10 +19,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.IndoorBuilding;
 import com.google.android.gms.maps.model.IndoorLevel;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -47,6 +49,8 @@ public class MapsFragment extends Fragment
     private List<String> actvItems = new ArrayList<>();
     private ClusterManager<Microlocation> clusterManager;
     private GoogleMap mMap;
+    private MyClusterRenderer myClusterRenderer;
+    private Marker oldMarker=null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,16 +101,8 @@ public class MapsFragment extends Fragment
         return super.onOptionsItemSelected(item);
     }
 
-    private void launchDirections() {
-        // Build intent to start Google Maps directions
-
-    }
-
-    private void get_Latlng() {
-        // do nothing
-    }
-
     private void initCamera() {
+
         CameraPosition position = CameraPosition.builder()
                 .target(new LatLng(DESTINATION_LATITUDE, DESTINATION_LONGITUDE))
                 .zoom(18f)
@@ -160,11 +156,29 @@ public class MapsFragment extends Fragment
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
+
         initCamera();
         clusterManager = new ClusterManager<>(getActivity(), mMap);
+        myClusterRenderer=new MyClusterRenderer(getActivity(), mMap, clusterManager);
         mMap.setOnCameraChangeListener(clusterManager);
         mMap.setOnMarkerClickListener(clusterManager);
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<Microlocation>() {
+            @Override
+            public boolean onClusterItemClick(Microlocation microlocation) {
+                if(oldMarker==null) {
+                    oldMarker = myClusterRenderer.getMarker(microlocation);
+                    oldMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_selected));
+                }
+                else {
+                    oldMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_unselected));
+                    Marker selectedMarker = myClusterRenderer.getMarker(microlocation);
+                    selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_selected));
+                    oldMarker=selectedMarker;
+                }
 
+                return false;
+            }
+        });
         clusterManager
                 .setOnClusterClickListener(new ClusterManager.OnClusterClickListener<Microlocation>() {
                     @Override
@@ -188,13 +202,6 @@ public class MapsFragment extends Fragment
         }.start();
 
         refreshClusterManager(markerItems);
-        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<Microlocation>() {
-            @Override
-            public boolean onClusterItemClick(Microlocation markerItem) {
-                return false;
-            }
-        });
-
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item, actvItems);
@@ -231,7 +238,7 @@ public class MapsFragment extends Fragment
     {
         clusterManager.clearItems();
         clusterManager.addItems(items);
-        clusterManager.setRenderer(new MyClusterRenderer(getActivity(), mMap, clusterManager));
+        clusterManager.setRenderer(myClusterRenderer);
     }
 
 }
