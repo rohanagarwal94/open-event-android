@@ -11,7 +11,7 @@ public abstract class Urls {
     public static final String API_VERSION = "v1";
 
     /**
-     * Change Event Id Here *
+     * Change EVENT Id Here *
      */
     public static final int EVENT_ID = 1;
 
@@ -50,8 +50,11 @@ public abstract class Urls {
 
     public static void setBaseUrl(String baseUrl) {
         if (URLUtil.isValidUrl(baseUrl)) {
-            BASE_URL = baseUrl;
-
+            if (!baseUrl.endsWith("/")) {
+                BASE_URL = baseUrl + "/";
+            } else {
+                BASE_URL = baseUrl;
+            }
         } else {
             BASE_URL = "http://abc//";
 

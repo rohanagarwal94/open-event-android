@@ -52,7 +52,7 @@ public class DbContract {
         public static final String CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME
                         + " ("
-                        + VER_EVENT + INT_TYPE  + COMMA_SEP
+                        + VER_EVENT + INT_TYPE + COMMA_SEP
                         + VER_TRACKS + INT_TYPE + COMMA_SEP
                         + VER_SESSIONS + INT_TYPE + COMMA_SEP
                         + VER_SPONSORS + INT_TYPE + COMMA_SEP
@@ -156,6 +156,33 @@ public class DbContract {
 
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
+
+    public static abstract class ServerSessionIdMapping implements BaseColumns {
+        public static final String TABLE_NAME = "serversessionid";
+
+        public static final String _ID = "_id";
+
+        public static final String SERVER_ID = "serverid";
+
+        public static final String LOCAL_ID = "localid";
+
+
+        public static final String[] FULL_PROJECTION = {
+                SERVER_ID,
+                LOCAL_ID
+        };
+
+        public static final String CREATE_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + TABLE_NAME
+                        + " ("
+                        + _ID + INT_TYPE + PRIMARY_KEY + COMMA_SEP
+                        + SERVER_ID + INT_TYPE + COMMA_SEP
+                        + LOCAL_ID + INT_TYPE
+                        + " );";
+
+        public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
 
     public static abstract class Sessions implements BaseColumns {
         public static final String TABLE_NAME = "sessions";
@@ -265,11 +292,17 @@ public class DbContract {
 
         public static final String LOGO_URL = "logo_url";
 
+        public static final String TYPE = "type";
+
+        public static final String LEVEL = "level";
+
         public static final String[] FULL_PROJECTION = {
                 ID,
                 NAME,
                 URL,
-                LOGO_URL
+                LOGO_URL,
+                TYPE,
+                LEVEL
         };
 
         public static final String CREATE_TABLE =
@@ -278,7 +311,9 @@ public class DbContract {
                         + ID + INT_TYPE + PRIMARY_KEY + COMMA_SEP
                         + NAME + TEXT_TYPE + COMMA_SEP
                         + URL + TEXT_TYPE + COMMA_SEP
-                        + LOGO_URL + TEXT_TYPE
+                        + LOGO_URL + TEXT_TYPE + COMMA_SEP
+                        + TYPE + TEXT_TYPE + COMMA_SEP
+                        + LEVEL + INT_TYPE
                         + " );";
 
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -367,6 +402,8 @@ public class DbContract {
 
         public static final String EVENT_URL = "event_url";
 
+        public static final String TIMEZONE = "timezone";
+
         public static final String[] FULL_PROJECTION = {
                 ID,
                 NAME,
@@ -377,7 +414,8 @@ public class DbContract {
                 LATITUDE,
                 LONGITUDE,
                 LOCATION_NAME,
-                EVENT_URL
+                EVENT_URL,
+                TIMEZONE
         };
 
         public static final String CREATE_TABLE =
@@ -392,7 +430,8 @@ public class DbContract {
                         + LATITUDE + REAL_TYPE + COMMA_SEP
                         + LONGITUDE + REAL_TYPE + COMMA_SEP
                         + LOCATION_NAME + TEXT_TYPE + COMMA_SEP
-                        + EVENT_URL + TEXT_TYPE
+                        + EVENT_URL + TEXT_TYPE + COMMA_SEP
+                        + TIMEZONE + TEXT_TYPE
                         + " );";
 
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;

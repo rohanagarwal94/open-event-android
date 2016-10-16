@@ -1,6 +1,7 @@
 package org.fossasia.openevent;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -26,6 +27,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
+import io.branch.referral.Branch;
 import timber.log.Timber;
 
 /**
@@ -41,6 +43,8 @@ public class OpenEventApp extends Application {
     MapModuleFactory mapModuleFactory;
 
     SharedPreferences sharedPreferences;
+
+    private static Context context;
 
     public static Bus getEventBus() {
         if (eventBus == null) {
@@ -62,7 +66,9 @@ public class OpenEventApp extends Application {
     public void onCreate() {
         super.onCreate();
         handler = new Handler(Looper.getMainLooper());
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        OpenEventApp.context = getApplicationContext();
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getAppContext());
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -70,6 +76,7 @@ public class OpenEventApp extends Application {
             Timber.plant(new CrashReportingTree());
         }
         DbSingleton.init(this);
+        Branch.getAutoInstance(this);
         mapModuleFactory = new MapModuleFactory();
         registerReceiver(new NetworkConnectivityChangeReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         getEventBus().register(this);
@@ -104,6 +111,11 @@ public class OpenEventApp extends Application {
 
 
     }
+
+    public static Context getAppContext() {
+        return OpenEventApp.context;
+    }
+
 
     @Subscribe
     public void onConnectionChangeReact(ConnectionCheckEvent event) {

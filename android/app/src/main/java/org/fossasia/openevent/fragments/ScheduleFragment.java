@@ -28,13 +28,18 @@ public class ScheduleFragment extends Fragment {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
         OpenEventApp.getEventBus().register(true);
-
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
         setupViewPager(viewPager);
         TabLayout scheduleTabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
         scheduleTabLayout.setupWithViewPager(viewPager);
-
         return view;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
     }
 
     @Override
@@ -42,8 +47,14 @@ public class ScheduleFragment extends Fragment {
         super.onResume();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+    }
+
     private void setupViewPager(ViewPager viewPager) {
-        ScheduleViewPagerAdapter adapter = new ScheduleViewPagerAdapter(getFragmentManager());
+        ScheduleViewPagerAdapter adapter = new ScheduleViewPagerAdapter(getChildFragmentManager());
         DbSingleton dbSingleton = DbSingleton.getInstance();
 
         List<String> event_days = dbSingleton.getDateList();
@@ -52,11 +63,8 @@ public class ScheduleFragment extends Fragment {
         for (int i = 0; i < daysofEvent; i++) {
             adapter.addFragment(new DayScheduleFragment(), Days.values()[i].toString(), i);
         }
-
         viewPager.setAdapter(adapter);
     }
-
-
 
 
 }

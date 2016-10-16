@@ -3,26 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<PreferenceCategory android:title="@string/data_update_frequency">-->
 
-        <!--<ListPreference-->
-            <!--android:defaultValue="@string/"-->
-            <!--android:dialogTitle="@string/settings_mode_notification"-->
-            <!--android:entries="@array/notification_mode_strings"-->
-            <!--android:entryValues="@array/notification_mode_values"-->
-            <!--android:key="@string/notification_key" />-->
-    <!--</PreferenceCategory>-->
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/download_mode_key"
+        android:summary="@string/summary_mode_download"
+        android:title="@string/settings_mode_download" />
 
-    <PreferenceCategory android:title="@string/settings_mode_api">
-
-        <ListPreference
-            android:defaultValue="@string/default_mode_api"
-            android:dialogTitle="@string/settings_mode_api"
-            android:entries="@array/mode_strings"
-            android:entryValues="@array/mode_values"
-            android:key="serverurlmode"
-            android:title="@string/settings_mode_api" />
-    </PreferenceCategory>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/timezone_mode_key"
+        android:summary="@string/summary_mode_timezone"
+        android:title="@string/settings_mode_timezone" />
 
     <PreferenceCategory android:title="@string/settings_mode_notification">
 

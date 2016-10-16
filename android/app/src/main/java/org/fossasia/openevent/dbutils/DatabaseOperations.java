@@ -267,7 +267,7 @@ public class DatabaseOperations {
 
 
     public ArrayList<Sponsor> getSponsorList(SQLiteDatabase mDb) {
-        String sortOrder = DbContract.Sponsors.NAME + ASCENDING;
+        String sortOrder = DbContract.Sponsors.LEVEL + ASCENDING + ", " + DbContract.Sponsors.NAME + ASCENDING;
         Cursor cursor = mDb.query(
                 DbContract.Sponsors.TABLE_NAME,
                 DbContract.Sponsors.FULL_PROJECTION,
@@ -282,13 +282,19 @@ public class DatabaseOperations {
         Sponsor sponsor;
 
         cursor.moveToFirst();
+
         while (!cursor.isAfterLast()) {
             sponsor = new Sponsor(
                     cursor.getInt(cursor.getColumnIndex(DbContract.Sponsors.ID)),
                     cursor.getString(cursor.getColumnIndex(DbContract.Sponsors.NAME)),
                     cursor.getString(cursor.getColumnIndex(DbContract.Sponsors.URL)),
-                    cursor.getString(cursor.getColumnIndex(DbContract.Sponsors.LOGO_URL))
+                    cursor.getString(cursor.getColumnIndex(DbContract.Sponsors.LOGO_URL)),
+                    cursor.getString(cursor.getColumnIndex(DbContract.Sponsors.TYPE)),
+                    cursor.getInt(cursor.getColumnIndex(DbContract.Sponsors.LEVEL))
+
             );
+            sponsor.changeSponsorTypeToString(cursor.getString(cursor.getColumnIndex(DbContract.Sponsors.TYPE)));
+
             sponsors.add(sponsor);
             cursor.moveToNext();
         }
@@ -521,7 +527,6 @@ public class DatabaseOperations {
 
         //Order
         String[] columns1 = {DbContract.Sessionsspeakers.SESSION_ID};
-
         Cursor sessionCursor = mDb.query(
                 DbContract.Sessionsspeakers.TABLE_NAME,
                 columns1,
@@ -532,18 +537,41 @@ public class DatabaseOperations {
                 null
         );
 
-        ArrayList<Integer> sessionIds = new ArrayList<>();
+        ArrayList<Integer> sortedSessionIds = new ArrayList<>();
         sessionCursor.moveToFirst();
         //Should return only one due to UNIQUE constraint
         while (!sessionCursor.isAfterLast()) {
-            sessionIds.add(sessionCursor.getInt(sessionCursor.getColumnIndex(DbContract.Sessionsspeakers.SESSION_ID)));
+            sortedSessionIds.add(sessionCursor.getInt(sessionCursor.getColumnIndex(DbContract.Sessionsspeakers.SESSION_ID)));
             sessionCursor.moveToNext();
         }
 
         sessionCursor.close();
+        String mappingSelection = DbContract.ServerSessionIdMapping.SERVER_ID + EQUAL + speakerSelected;
+        ArrayList<Integer> sessionIds = new ArrayList<>();
+
+        for (int i = 0; i < sortedSessionIds.size(); i++) {
+            Cursor mappingCursor = mDb.query(
+                    DbContract.ServerSessionIdMapping.TABLE_NAME,
+                    DbContract.ServerSessionIdMapping.FULL_PROJECTION,
+                    mappingSelection,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            mappingCursor.moveToFirst();
+            //Should return only one due to UNIQUE constraint
+            while (!mappingCursor.isAfterLast()) {
+                sessionIds.add(mappingCursor.getInt(mappingCursor.getColumnIndex(DbContract.ServerSessionIdMapping.LOCAL_ID)));
+                mappingCursor.moveToNext();
+            }
+
+            mappingCursor.close();
+        }
+
 
         ArrayList<Session> sessions = new ArrayList<>();
-
         for (int i = 0; i < sessionIds.size(); i++) {
             String sessionTableColumnSelection = DbContract.Sessions.ID + EQUAL + sessionIds.get(i);
             Cursor sessionTableCursor = mDb.query(
@@ -584,6 +612,7 @@ public class DatabaseOperations {
                 }
                 sessionTableCursor.moveToNext();
                 sessionTableCursor.close();
+
             }
         }
 
@@ -647,7 +676,8 @@ public class DatabaseOperations {
                     cursor.getFloat(cursor.getColumnIndex(DbContract.Event.LATITUDE)),
                     cursor.getFloat(cursor.getColumnIndex(DbContract.Event.LONGITUDE)),
                     cursor.getString(cursor.getColumnIndex(DbContract.Event.LOCATION_NAME)),
-                    cursor.getString(cursor.getColumnIndex(DbContract.Event.EVENT_URL)));
+                    cursor.getString(cursor.getColumnIndex(DbContract.Event.EVENT_URL)),
+                    cursor.getString(cursor.getColumnIndex(DbContract.Event.TIMEZONE)));
             cursor.close();
         }
         return event;
@@ -960,11 +990,11 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<Session> getSessionbyDate(String date, SQLiteDatabase mDb) {
+    public ArrayList<Session> getSessionbyDate(String date, String sortOrder, SQLiteDatabase mDb) {
 
         String sessionColumnSelection = DbContract.Sessions.START_DATE + EQUAL + DatabaseUtils.sqlEscapeString(date);
 
-        String sortOrder = DbContract.Sessions.ID + ASCENDING;
+        String order = sortOrder + ASCENDING;
 
         Cursor sessionCursor = mDb.query(
                 DbContract.Sessions.TABLE_NAME,
@@ -973,7 +1003,7 @@ public class DatabaseOperations {
                 null,
                 null,
                 null,
-                sortOrder
+                order
         );
 
 

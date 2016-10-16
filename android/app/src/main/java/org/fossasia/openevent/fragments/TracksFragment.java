@@ -54,9 +54,9 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
 
     private View windowFrame;
 
-    private static TextView noTracksView;
+    private TextView noTracksView;
 
-    private static RecyclerView tracksRecyclerView;
+    private RecyclerView tracksRecyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,13 +85,7 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (NetworkUtils.haveNetworkConnection(getActivity())) {
-                    DataDownloadManager.getInstance().downloadTracks();
-                    setVisibility(true);
-                } else {
-                    OpenEventApp.getEventBus().post(new TracksDownloadEvent(false));
-                    setVisibility(false);
-                }
+                refresh();
             }
         });
 
@@ -103,7 +97,7 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
         return view;
     }
 
-    public static void setVisibility(Boolean isDownloadDone) {
+    public void setVisibility(Boolean isDownloadDone) {
         if (isDownloadDone) {
             noTracksView.setVisibility(View.GONE);
             tracksRecyclerView.setVisibility(View.VISIBLE);
@@ -132,6 +126,7 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
                 intent.putExtra(Intent.EXTRA_SUBJECT, R.string.share_links);
                 intent.setType("text/plain");
                 startActivity(Intent.createChooser(intent, getResources().getString(R.string.share_links)));
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -167,7 +162,7 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
 
     @Subscribe
     public void RefreshData(RefreshUiEvent event) {
-
+        setVisibility(true);
         if (searchText.length() == 0) {
             tracksListAdapter.refresh();
         }
@@ -182,8 +177,23 @@ public class TracksFragment extends Fragment implements SearchView.OnQueryTextLi
 
         } else {
             if (getActivity() != null) {
-                Snackbar.make(windowFrame, getActivity().getString(R.string.refresh_failed), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(windowFrame, getActivity().getString(R.string.refresh_failed), Snackbar.LENGTH_LONG).setAction(R.string.retry_download, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        refresh();
+                    }
+                }).show();
             }
+        }
+    }
+
+    private void refresh() {
+        if (NetworkUtils.haveNetworkConnection(getActivity())) {
+            DataDownloadManager.getInstance().downloadTracks();
+            setVisibility(true);
+        } else {
+            OpenEventApp.getEventBus().post(new TracksDownloadEvent(false));
+            setVisibility(false);
         }
     }
 

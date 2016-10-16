@@ -86,6 +86,7 @@ public class SpeakersListAdapter extends BaseRVAdapter<Speaker, ViewHolder.Viewh
         viewholder.setImgView1((ImageView) view.findViewById(R.id.speaker_image));
         viewholder.setTxtView1((TextView) view.findViewById(R.id.speaker_name));
         viewholder.setTxtView2((TextView) view.findViewById(R.id.speaker_info));
+        viewholder.setTxtView3((TextView) view.findViewById(R.id.speaker_info_country));
 
         return viewholder;
     }
@@ -97,12 +98,13 @@ public class SpeakersListAdapter extends BaseRVAdapter<Speaker, ViewHolder.Viewh
         StringBuilder photoUri = new StringBuilder();
         photoUri.append(Urls.getBaseUrl()).append(current.getPhoto());
         Uri uri = Uri.parse(photoUri.toString());
-
         Picasso.with(holder.getImgView1().getContext()).load(uri)
                 .placeholder(R.drawable.ic_account_circle_grey_24dp).transform(new CircleTransform()).into(holder.getImgView1());
 
-        holder.getTxtView2().setText(String.format("%s %s", current.getPosition(), current.getOrganisation()));
+        holder.getTxtView2().setText(String.format("%s%s", current.getPosition(), current.getOrganisation()));
         holder.getTxtView1().setText(TextUtils.isEmpty(current.getName()) ? "" : current.getName());
+        holder.getTxtView3().setText(String.format("%s",current.getCountry()));
+
 
         holder.setItemClickListener(listener);
     }

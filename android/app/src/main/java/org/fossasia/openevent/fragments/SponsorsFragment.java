@@ -23,11 +23,14 @@ import com.squareup.otto.Subscribe;
 import org.fossasia.openevent.OpenEventApp;
 import org.fossasia.openevent.R;
 import org.fossasia.openevent.adapters.SponsorsListAdapter;
+import org.fossasia.openevent.data.Sponsor;
 import org.fossasia.openevent.dbutils.DataDownloadManager;
 import org.fossasia.openevent.dbutils.DbSingleton;
 import org.fossasia.openevent.events.SponsorDownloadEvent;
 import org.fossasia.openevent.utils.NetworkUtils;
 import org.fossasia.openevent.utils.RecyclerItemClickListener;
+
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -55,11 +58,7 @@ public class SponsorsFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (NetworkUtils.haveNetworkConnection(getActivity())) {
-                    DataDownloadManager.getInstance().downloadSponsors();
-                } else {
-                    OpenEventApp.getEventBus().post(new SponsorDownloadEvent(true));
-                }
+                refresh();
             }
         });
         sponsorsListAdapter = new SponsorsListAdapter(dbSingleton.getSponsorList());
@@ -68,8 +67,10 @@ public class SponsorsFragment extends Fragment {
         sponsorsRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(view.getContext(), new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                String sponsorUrl = dbSingleton.getSponsorList().get(position).getUrl();
-                if (!sponsorUrl.startsWith("http") || !sponsorUrl.startsWith("https")) {
+                List<Sponsor> objects = dbSingleton.getSponsorList();
+                Sponsor sponsor = objects.get(position);
+                String sponsorUrl = sponsor.getUrl();
+                if (!sponsorUrl.startsWith("http") && !sponsorUrl.startsWith("https")) {
                     sponsorUrl = "http://" + sponsorUrl;
                 }
                 if (Patterns.WEB_URL.matcher(sponsorUrl).matches()) {
@@ -77,16 +78,25 @@ public class SponsorsFragment extends Fragment {
                     startActivity(sponsorsIntent);
                 } else {
                     Snackbar.make(view, R.string.invalid_url, Snackbar.LENGTH_LONG).show();
+                    Timber.d(sponsorUrl);
                 }
+
             }
-        }));
-        if (sponsorsListAdapter.getItemCount() != 0) {
+        }
+
+        ));
+        if (sponsorsListAdapter.getItemCount() != 0)
+
+        {
             noSponsorsView.setVisibility(View.GONE);
             sponsorsRecyclerView.setVisibility(View.VISIBLE);
-        } else {
+        } else
+
+        {
             noSponsorsView.setVisibility(View.VISIBLE);
             sponsorsRecyclerView.setVisibility(View.GONE);
         }
+
         return view;
     }
 
@@ -101,10 +111,23 @@ public class SponsorsFragment extends Fragment {
 
         } else {
             if (getActivity() != null) {
-                Snackbar.make(getView(), getActivity().getString(R.string.refresh_failed), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getView(), getActivity().getString(R.string.refresh_failed), Snackbar.LENGTH_LONG).setAction(R.string.retry_download, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        refresh();
+                    }
+                }).show();
             }
             Timber.d("Refresh not done");
 
+        }
+    }
+
+    private void refresh() {
+        if (NetworkUtils.haveNetworkConnection(getActivity())) {
+            DataDownloadManager.getInstance().downloadSponsors();
+        } else {
+            OpenEventApp.getEventBus().post(new SponsorDownloadEvent(true));
         }
     }
 

@@ -44,6 +44,7 @@ import org.fossasia.openevent.OpenEventApp;
 import org.fossasia.openevent.R;
 import org.fossasia.openevent.api.Urls;
 import org.fossasia.openevent.data.Event;
+import org.fossasia.openevent.data.EventDates;
 import org.fossasia.openevent.data.Microlocation;
 import org.fossasia.openevent.data.Session;
 import org.fossasia.openevent.data.SessionSpeakersMapping;
@@ -54,7 +55,7 @@ import org.fossasia.openevent.dbutils.DataDownloadManager;
 import org.fossasia.openevent.dbutils.DbSingleton;
 import org.fossasia.openevent.events.CounterEvent;
 import org.fossasia.openevent.events.DataDownloadEvent;
-import org.fossasia.openevent.events.EventDatesDownloadEvent;
+import org.fossasia.openevent.events.DownloadEvent;
 import org.fossasia.openevent.events.EventDownloadEvent;
 import org.fossasia.openevent.events.JsonReadEvent;
 import org.fossasia.openevent.events.MicrolocationDownloadEvent;
@@ -75,6 +76,7 @@ import org.fossasia.openevent.fragments.SponsorsFragment;
 import org.fossasia.openevent.fragments.TracksFragment;
 import org.fossasia.openevent.utils.CommonTaskLoop;
 import org.fossasia.openevent.utils.ConstantStrings;
+import org.fossasia.openevent.utils.ISO8601Date;
 import org.fossasia.openevent.utils.NetworkUtils;
 import org.fossasia.openevent.utils.SmoothActionBarDrawerToggle;
 import org.fossasia.openevent.widget.DialogFactory;
@@ -83,6 +85,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -100,29 +105,22 @@ public class MainActivity extends BaseActivity {
 
     private static final String BOOKMARK = "bookmarks";
 
-    private final String FRAGMENT_TAG = "FTAG";
+    private final String FRAGMENT_TAG_TRACKS = "FTAGT";
 
-    private String errorType;
-
-    private String errorDesc;
-
-    private SharedPreferences sharedPreferences;
-
+    private final String FRAGMENT_TAG_REST = "FTAGR";
     @Bind(R.id.toolbar)
     Toolbar toolbar;
-
     @Bind(R.id.nav_view)
     NavigationView navigationView;
-
     @Bind(R.id.progress)
     ProgressBar downloadProgress;
-
     @Bind(R.id.layout_main)
     CoordinatorLayout mainFrame;
-
     @Bind(R.id.drawer)
     DrawerLayout drawerLayout;
-
+    private String errorType;
+    private String errorDesc;
+    private SharedPreferences sharedPreferences;
     private int counter;
 
     private int eventsDone;
@@ -135,6 +133,23 @@ public class MainActivity extends BaseActivity {
     public static Intent createLaunchFragmentIntent(Context context) {
         return new Intent(context, MainActivity.class)
                 .putExtra(NAV_ITEM, BOOKMARK);
+    }
+
+    public static void getDaysBetweenDates(Date startdate, Date enddate) {
+        ArrayList<String> dates = new ArrayList<String>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startdate);
+
+        while (calendar.getTime().before(enddate)) {
+            Date result = calendar.getTime();
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.setTime(result);
+            dates.add(new EventDates(ISO8601Date.dateFromCalendar(calendar1)).generateSql());
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        DbSingleton.getInstance().insertQueries(dates);
+
     }
 
     @Override
@@ -168,37 +183,59 @@ public class MainActivity extends BaseActivity {
 
         downloadProgress.setVisibility(View.VISIBLE);
         downloadProgress.setIndeterminate(true);
-        this.findViewById(android.R.id.content).setBackgroundColor(Color.LTGRAY);
+        this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
         if (NetworkUtils.haveNetworkConnection(this)) {
             if (!sharedPreferences.getBoolean(ConstantStrings.IS_DOWNLOAD_DONE, false)) {
                 AlertDialog.Builder downloadDialog = new AlertDialog.Builder(this);
                 downloadDialog.setTitle(R.string.download_assets).setMessage(R.string.charges_warning);
                 downloadDialog.setIcon(R.drawable.ic_file_download_black_24dp);
                 downloadDialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        DbSingleton.getInstance().clearDatabase();
-                        OpenEventApp.postEventOnUIThread(new DataDownloadEvent());
-                        sharedPreferences.edit().putBoolean(ConstantStrings.IS_DOWNLOAD_DONE, true).apply();
-                        TracksFragment.setVisibility(true);
-                    }
-                });
-                downloadDialog.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        downloadFromAssets();
-                    }
-                });
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                DbSingleton.getInstance().clearDatabase();
+                                Boolean preference = sharedPreferences.getBoolean(getResources().getString(R.string.download_mode_key), true);
+                                if (preference) {
+                                    if (NetworkUtils.haveWifiConnection(MainActivity.this)) {
+                                        OpenEventApp.postEventOnUIThread(new DataDownloadEvent());
+                                        sharedPreferences.edit().putBoolean(ConstantStrings.IS_DOWNLOAD_DONE, true).apply();
+
+                                    } else {
+                                        final Snackbar snackbar = Snackbar.make(mainFrame, R.string.internet_preference_warning, Snackbar.LENGTH_INDEFINITE);
+                                        snackbar.setAction(R.string.yes, new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                downloadFromAssets();
+                                            }
+                                        });
+                                        snackbar.show();
+                                    }
+                                } else {
+                                    OpenEventApp.postEventOnUIThread(new DataDownloadEvent());
+                                }
+
+                            }
+                        }
+
+                );
+                downloadDialog.setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
+
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                downloadFromAssets();
+
+                            }
+                        }
+
+                );
                 downloadDialog.show();
+            } else {
+                downloadProgress.setVisibility(View.GONE);
             }
-            else {
-                OpenEventApp.postEventOnUIThread(new DataDownloadEvent());
-            }
-        } else if (!sharedPreferences.getBoolean(ConstantStrings.DATABASE_RECORDS_EXIST, false)) {
-            downloadFromAssets();
         } else {
-            //TODO : Add some feedback on the error
-            downloadProgress.setVisibility(View.GONE);
+            final Snackbar snackbar = Snackbar.make(mainFrame, R.string.display_offline_schedule, Snackbar.LENGTH_LONG);
+            snackbar.show();
+            downloadFromAssets();
         }
         if (savedInstanceState == null) {
             currentMenuItemId = R.id.nav_tracks;
@@ -212,7 +249,7 @@ public class MainActivity extends BaseActivity {
             }
         }
 
-        if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG) == null) {
+        if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_TRACKS) == null && getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_REST) == null) {
             doMenuAction(currentMenuItemId);
         }
     }
@@ -263,15 +300,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(navigationView)) {
-            drawerLayout.closeDrawer(navigationView);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
     private void setUpToolbar() {
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -295,6 +323,9 @@ public class MainActivity extends BaseActivity {
 
     private void syncComplete() {
         downloadProgress.setVisibility(View.GONE);
+        Event currentEvent = DbSingleton.getInstance().getEventDetails();
+        getDaysBetweenDates(ISO8601Date.getDateObject(currentEvent.getStart()), ISO8601Date.getDateObject(currentEvent.getEnd()));
+
         Bus bus = OpenEventApp.getEventBus();
         bus.post(new RefreshUiEvent());
         DbSingleton dbSingleton = DbSingleton.getInstance();
@@ -311,9 +342,20 @@ public class MainActivity extends BaseActivity {
         Timber.d("Download done");
     }
 
-    private void downloadFailed() {
+    private void downloadFailed(final DownloadEvent event) {
         downloadProgress.setVisibility(View.GONE);
-        Snackbar.make(mainFrame, getString(R.string.download_failed), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mainFrame, getString(R.string.download_failed), Snackbar.LENGTH_LONG).setAction(R.string.retry_download, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (event == null) {
+                    Timber.d("no internet.");
+                    OpenEventApp.postEventOnUIThread(new DataDownloadEvent());
+                } else {
+                    Timber.tag(COUNTER_TAG).d(event.getClass().getSimpleName());
+                    OpenEventApp.postEventOnUIThread(event);
+                }
+            }
+        }).show();
 
     }
 
@@ -336,14 +378,14 @@ public class MainActivity extends BaseActivity {
         switch (menuItemId) {
             case R.id.nav_tracks:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new TracksFragment(), FRAGMENT_TAG).commit();
+                        .replace(R.id.content_frame, new TracksFragment(), FRAGMENT_TAG_TRACKS).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.menu_tracks);
                 }
                 break;
             case R.id.nav_schedule:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new ScheduleFragment(), FRAGMENT_TAG).commit();
+                        .replace(R.id.content_frame, new ScheduleFragment(), FRAGMENT_TAG_REST).commit();
                 addShadowToAppBar(false);
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.menu_schedule);
@@ -353,31 +395,32 @@ public class MainActivity extends BaseActivity {
                 DbSingleton dbSingleton = DbSingleton.getInstance();
                 if (!dbSingleton.isBookmarksTableEmpty()) {
                     fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, new BookmarksFragment(), FRAGMENT_TAG).commit();
+                            .replace(R.id.content_frame, new BookmarksFragment(), FRAGMENT_TAG_REST).commit();
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(R.string.menu_bookmarks);
                     }
                 } else {
                     DialogFactory.createSimpleActionDialog(this, R.string.bookmarks, R.string.empty_list, null).show();
+                    if (currentMenuItemId == R.id.nav_schedule) addShadowToAppBar(false);
                 }
                 break;
             case R.id.nav_speakers:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new SpeakerFragment(), FRAGMENT_TAG).commit();
+                        .replace(R.id.content_frame, new SpeakerFragment(), FRAGMENT_TAG_REST).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.menu_speakers);
                 }
                 break;
             case R.id.nav_sponsors:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new SponsorsFragment(), FRAGMENT_TAG).commit();
+                        .replace(R.id.content_frame, new SponsorsFragment(), FRAGMENT_TAG_REST).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.menu_sponsor);
                 }
                 break;
             case R.id.nav_locations:
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new LocationsFragment(), FRAGMENT_TAG).commit();
+                        .replace(R.id.content_frame, new LocationsFragment(), FRAGMENT_TAG_REST).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.menu_locations);
                 }
@@ -389,7 +432,7 @@ public class MainActivity extends BaseActivity {
                         ((OpenEventApp) getApplication())
                                 .getMapModuleFactory()
                                 .provideMapModule()
-                                .provideMapFragment(), FRAGMENT_TAG).commit();
+                                .provideMapFragment(), FRAGMENT_TAG_REST).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.menu_map);
                 }
@@ -420,6 +463,24 @@ public class MainActivity extends BaseActivity {
         drawerLayout.closeDrawers();
     }
 
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_TRACKS);
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (fragment != null && fragment.isVisible()) {
+            super.onBackPressed();
+        } else {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, new TracksFragment(), FRAGMENT_TAG_TRACKS).commit();
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(R.string.menu_tracks);
+            }
+            navigationView.setCheckedItem(R.id.nav_tracks);
+        }
+    }
+
     public void addShadowToAppBar(boolean addShadow) {
         if (addShadow) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -442,11 +503,11 @@ public class MainActivity extends BaseActivity {
         builder.show();
     }
 
-    //Subscribe Event
+    //Subscribe EVENT
     @Subscribe
     public void onCounterReceiver(CounterEvent event) {
         counter = event.getRequestsCount();
-        Timber.tag(COUNTER_TAG).d(counter + " counter" );
+        Timber.tag(COUNTER_TAG).d(counter + " counter");
         if (counter == 0) {
             syncComplete();
         }
@@ -461,7 +522,7 @@ public class MainActivity extends BaseActivity {
                 syncComplete();
             }
         } else {
-            downloadFailed();
+            downloadFailed(event);
         }
     }
 
@@ -475,7 +536,7 @@ public class MainActivity extends BaseActivity {
             }
         } else {
 
-            downloadFailed();
+            downloadFailed(event);
         }
     }
 
@@ -489,7 +550,7 @@ public class MainActivity extends BaseActivity {
             }
         } else {
 
-            downloadFailed();
+            downloadFailed(event);
         }
     }
 
@@ -503,13 +564,13 @@ public class MainActivity extends BaseActivity {
             }
         } else {
 
-            downloadFailed();
+            downloadFailed(event);
         }
     }
 
     @Subscribe
     public void noInternet(NoInternetEvent event) {
-        downloadFailed();
+        downloadFailed(null);
     }
 
     @Subscribe
@@ -522,7 +583,7 @@ public class MainActivity extends BaseActivity {
             }
         } else {
 
-            downloadFailed();
+            downloadFailed(event);
         }
     }
 
@@ -536,22 +597,9 @@ public class MainActivity extends BaseActivity {
             }
         } else {
 
-            downloadFailed();
+            downloadFailed(event);
         }
 
-    }
-
-    @Subscribe
-    public void onEventDatesDownloadDone(EventDatesDownloadEvent event) {
-        if (event.isState()) {
-            eventsDone++;
-            Timber.tag(COUNTER_TAG).d(eventsDone + " " + counter);
-            if (counter == eventsDone) {
-                syncComplete();
-            }
-        } else {
-            downloadFailed();
-        }
     }
 
     @Subscribe
@@ -598,7 +646,7 @@ public class MainActivity extends BaseActivity {
             public void run() {
                 final Gson gson = new Gson();
                 switch (name) {
-                    case ConstantStrings.Event:
+                    case ConstantStrings.EVENT:
                         CommonTaskLoop.getInstance().post(new Runnable() {
                             @Override
                             public void run() {
@@ -608,7 +656,7 @@ public class MainActivity extends BaseActivity {
                             }
                         });
                         break;
-                    case ConstantStrings.Tracks:
+                    case ConstantStrings.TRACKS:
                         CommonTaskLoop.getInstance().post(new Runnable() {
                             @Override
                             public void run() {
@@ -624,7 +672,7 @@ public class MainActivity extends BaseActivity {
                             }
                         });
                         break;
-                    case ConstantStrings.Sessions: {
+                    case ConstantStrings.SESSIONS: {
                         Type listType = new TypeToken<List<Session>>() {
                         }.getType();
                         List<Session> sessions = gson.fromJson(json, listType);
@@ -635,10 +683,9 @@ public class MainActivity extends BaseActivity {
                         }
                         DbSingleton.getInstance().insertQueries(queries);
                         OpenEventApp.postEventOnUIThread(new SessionDownloadEvent(true));
-
                         break;
                     }
-                    case ConstantStrings.Speakers: {
+                    case ConstantStrings.SPEAKERS: {
                         Type listType = new TypeToken<List<Speaker>>() {
                         }.getType();
                         List<Speaker> speakers = gson.fromJson(json, listType);
@@ -658,7 +705,7 @@ public class MainActivity extends BaseActivity {
 
                         break;
                     }
-                    case ConstantStrings.Sponsors:
+                    case ConstantStrings.SPONSORS:
                         CommonTaskLoop.getInstance().post(new Runnable() {
                             @Override
                             public void run() {
@@ -674,7 +721,7 @@ public class MainActivity extends BaseActivity {
                             }
                         });
                         break;
-                    case ConstantStrings.Microlocations:
+                    case ConstantStrings.MICROLOCATIONS:
                         CommonTaskLoop.getInstance().post(new Runnable() {
                             @Override
                             public void run() {
@@ -720,16 +767,20 @@ public class MainActivity extends BaseActivity {
     }
 
     public void downloadFromAssets() {
-        //TODO: Add and Take counter value from to config.json
-        sharedPreferences.edit().putBoolean(ConstantStrings.DATABASE_RECORDS_EXIST, true).apply();
-        counter = 6;
-        readJsonAsset(Urls.EVENT);
-        readJsonAsset(Urls.TRACKS);
-        readJsonAsset(Urls.SPEAKERS);
-        readJsonAsset(Urls.SESSIONS);
-        readJsonAsset(Urls.SPONSORS);
-        readJsonAsset(Urls.MICROLOCATIONS);
 
+        if (!sharedPreferences.getBoolean(ConstantStrings.DATABASE_RECORDS_EXIST, false)) {
+            //TODO: Add and Take counter value from to config.json
+            sharedPreferences.edit().putBoolean(ConstantStrings.DATABASE_RECORDS_EXIST, true).apply();
+            counter = 6;
+            readJsonAsset(Urls.EVENT);
+            readJsonAsset(Urls.TRACKS);
+            readJsonAsset(Urls.SPEAKERS);
+            readJsonAsset(Urls.SESSIONS);
+            readJsonAsset(Urls.SPONSORS);
+            readJsonAsset(Urls.MICROLOCATIONS);
+        } else {
+            downloadProgress.setVisibility(View.GONE);
+        }
     }
 
     public void readJsonAsset(final String name) {
@@ -739,7 +790,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void run() {
                 try {
-                    InputStream inputStream = getAssets().open(name + ".json");
+                    InputStream inputStream = getAssets().open(name);
                     int size = inputStream.available();
                     byte[] buffer = new byte[size];
                     inputStream.read(buffer);
@@ -750,11 +801,11 @@ public class MainActivity extends BaseActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
 
-
                 }
                 OpenEventApp.postEventOnUIThread(new JsonReadEvent(name, json));
 
             }
         });
     }
+
 }

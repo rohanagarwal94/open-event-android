@@ -1,5 +1,11 @@
 package org.fossasia.openevent.utils;
 
+import android.preference.PreferenceManager;
+
+import org.fossasia.openevent.OpenEventApp;
+import org.fossasia.openevent.data.Event;
+import org.fossasia.openevent.dbutils.DbSingleton;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,6 +25,11 @@ public final class ISO8601Date {
     /**
      * Transform Calendar to ISO 8601 string.
      */
+
+    public static String eventTimezone = "";
+    public static final String TIMEZONE_MODE = "timezone_mode";
+
+
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
         String formatted = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
@@ -34,39 +45,46 @@ public final class ISO8601Date {
         return fromCalendar(GregorianCalendar.getInstance());
     }
 
+    public static String dateFromCalendar(Calendar currentDate) {
+        return fromCalendar(currentDate).split("T")[0];
+    }
+
 
     public static String getTimeZoneDateString(final Date date) {
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("EE, dd MMM yyyy, HH:mm, z");
-        dateFormat.setTimeZone(TimeZone.getDefault());
+        dateFormat.setTimeZone(getEventTimezone());
         String DateToStr = dateFormat.format(date);
-        Timber.tag("counter").d(DateToStr);
         return DateToStr;
     }
 
     public static Date getTimeZoneDate(final Date date) {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("EE, dd MMM yyyy, HH:mm, z");
-        dateFormat.setTimeZone(TimeZone.getDefault());
+        dateFormat.setTimeZone(getEventTimezone());
         String DateToStr = dateFormat.format(date);
-        Timber.tag("counter").d(DateToStr);
         return date;
     }
 
-    public static String getTime(final Date date) {
+    public static String get24HourTime(final Date date) {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm ");
-        String timeToStr = dateFormat.format(date);
-
-        return timeToStr;
+        dateFormat.setTimeZone(getEventTimezone());
+        return dateFormat.format(date);
     }
 
-    public static Date getDateObject(final String iso8601String) {
+    public static String get12HourTime(final Date date) {
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("KK:mm a");
+        dateFormat.setTimeZone(getEventTimezone());
+        return dateFormat.format(date);
+    }
+
+
+    public static Date getDateObject(final String iso8601String) {
+        setEventTimezone();
         StringBuilder s = new StringBuilder();
         s.append(iso8601String).append("Z");
         String final1 = s.toString();
-        Timber.tag("time").d(final1);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -84,5 +102,22 @@ public final class ISO8601Date {
         return date;
     }
 
+    public static TimeZone getEventTimezone() {
+        TimeZone selected;
+        if (!PreferenceManager.getDefaultSharedPreferences(OpenEventApp.getAppContext()).getBoolean(TIMEZONE_MODE, false)) {
+            setEventTimezone();
+            selected = TimeZone.getTimeZone(eventTimezone);
+        } else {
+            selected = TimeZone.getDefault();
+        }
+        return selected;
 
+    }
+
+    public static void setEventTimezone() {
+        if (eventTimezone.isEmpty()) {
+            Event event = DbSingleton.getInstance().getEventDetails();
+            ISO8601Date.eventTimezone = (event.getTimezone());
+        }
+    }
 }

@@ -8,6 +8,10 @@ import android.view.Window;
 
 import org.fossasia.openevent.OpenEventApp;
 import org.fossasia.openevent.R;
+import org.json.JSONObject;
+
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
 
 /**
  * Created by MananWason on 10-06-2015.
@@ -19,9 +23,7 @@ public class SplashActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         OpenEventApp.getEventBus().register(this);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_splash);
-
+        initBranch();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -32,5 +34,27 @@ public class SplashActivity extends Activity {
             }
         }, SPLASH_DISPLAY_LENGTH);
     }
-}
 
+
+    private void initBranch() {
+        Branch branch = Branch.getInstance(getApplicationContext());
+        branch.initSession(new Branch.BranchReferralInitListener() {
+            @Override
+            public void onInitFinished(JSONObject referringParams, BranchError error) {
+                if (error == null) {
+                    Branch.getInstance(getApplicationContext()).userCompletedAction("init finished");
+                } else {
+                    Branch.getInstance(getApplicationContext()).userCompletedAction("init failed");
+                }
+            }
+        }, this.getIntent().getData(), this);
+    }
+
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        //This is associated with branch IO Integration
+        this.setIntent(intent);
+    }
+
+}

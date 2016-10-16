@@ -74,11 +74,11 @@ public class MapsFragment extends Fragment
 
     @Override
     public void onMapReady(GoogleMap map) {
-
         if (map != null) {
             mMap = map;
             setUpMap();
         }
+
     }
 
     @Override

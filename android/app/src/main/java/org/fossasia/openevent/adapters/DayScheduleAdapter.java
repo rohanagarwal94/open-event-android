@@ -1,5 +1,6 @@
 package org.fossasia.openevent.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import org.fossasia.openevent.R;
 import org.fossasia.openevent.data.Session;
 import org.fossasia.openevent.dbutils.DbSingleton;
 import org.fossasia.openevent.utils.ISO8601Date;
+import org.fossasia.openevent.utils.SortOrder;
 import org.fossasia.openevent.utils.ViewHolder;
 
 import java.util.ArrayList;
@@ -22,12 +24,14 @@ import timber.log.Timber;
  * Created by Manan Wason on 17/06/16.
  */
 public class DayScheduleAdapter extends BaseRVAdapter<Session, ViewHolder.Viewholder> {
+
+    private Context context;
     @SuppressWarnings("all")
     Filter filter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             DbSingleton instance = DbSingleton.getInstance();
-            List<Session> sessionList = instance.getSessionbyDate(eventDate);
+            List<Session> sessionList = instance.getSessionbyDate(eventDate, SortOrder.sortOrderSchedule(context));
             final ArrayList<Session> filteredSessionsList = new ArrayList<>();
             String query = constraint.toString().toLowerCase(Locale.getDefault());
             for (Session session : sessionList) {
@@ -53,8 +57,9 @@ public class DayScheduleAdapter extends BaseRVAdapter<Session, ViewHolder.Viewho
 
     private String eventDate;
 
-    public DayScheduleAdapter(List<Session> sessions) {
+    public DayScheduleAdapter(List<Session> sessions, Context context) {
         super(sessions);
+        this.context = context;
     }
 
     public void setOnClickListener(ViewHolder.SetOnClickListener clickListener) {
@@ -72,17 +77,19 @@ public class DayScheduleAdapter extends BaseRVAdapter<Session, ViewHolder.Viewho
         ViewHolder.Viewholder viewholder = new ViewHolder.Viewholder(view);
         viewholder.setTxtView1((TextView) view.findViewById(R.id.start_time));
         viewholder.setTxtView2((TextView) view.findViewById(R.id.slot_title));
-        viewholder.setTxtView3((TextView) view.findViewById(R.id.slot_description));
+        viewholder.setTxtView3((TextView) view.findViewById(R.id.timings));
         return viewholder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder.Viewholder holder, int position) {
         Session currentSession = getItem(position);
+        String startTime = ISO8601Date.get12HourTime(ISO8601Date.getDateObject(currentSession.getStartTime()));
+        String endTime = ISO8601Date.get12HourTime(ISO8601Date.getDateObject(currentSession.getEndTime()));
 
-        holder.getTxtView1().setText(ISO8601Date.getTimeZoneDateString(ISO8601Date.getDateObject(currentSession.getStartTime())));
+        holder.getTxtView1().setText(startTime);
         holder.getTxtView2().setText(currentSession.getTitle());
-        holder.getTxtView3().setText(currentSession.getDescription());
+        holder.getTxtView3().setText(String.format("%s - %s", startTime, endTime));
         holder.setItemClickListener(listener);
 
     }
@@ -90,7 +97,7 @@ public class DayScheduleAdapter extends BaseRVAdapter<Session, ViewHolder.Viewho
     public void refresh() {
         DbSingleton dbSingleton = DbSingleton.getInstance();
         clear();
-        animateTo(dbSingleton.getSessionbyDate(eventDate));
+        animateTo(dbSingleton.getSessionbyDate(eventDate, SortOrder.sortOrderSchedule(context)));
     }
 
     /**

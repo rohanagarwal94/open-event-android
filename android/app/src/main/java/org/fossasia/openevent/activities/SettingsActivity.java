@@ -2,11 +2,11 @@ package org.fossasia.openevent.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,10 +24,9 @@ import org.fossasia.openevent.R;
  */
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
 
-    private static final String API_PREF_MODE = "serverurlmode";
-
-    private static final String NOTIFICATION_PREF_MODE = "notification";
-    ListPreference listPreference;
+    public static final String NOTIFICATION_PREF_MODE = "notification";
+    private SwitchPreference internetPreference;
+    private SwitchPreference timezonePreference;
     private Preference prefNotification;
     private SharedPreferences preferences;
     private AppCompatDelegate mDelegate;
@@ -42,16 +41,31 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         setContentView(R.layout.activity_settings);
         setToolbar();
         PreferenceScreen preferenceScreen = getPreferenceScreen();
-        listPreference = (ListPreference) preferenceScreen.findPreference(API_PREF_MODE);
-        listPreference.setDefaultValue(getResources().getString(R.string.default_mode_api));
-        listPreference.setOnPreferenceChangeListener(this);
-        prefNotification = findPreference(getString(R.string.notification_key));
+        internetPreference = (SwitchPreference) preferenceScreen.findPreference(getResources().getString(R.string.download_mode_key));
+        internetPreference.setOnPreferenceChangeListener(this);
+        timezonePreference = (SwitchPreference) preferenceScreen.findPreference(getResources().getString(R.string.timezone_mode_key));
+        timezonePreference.setOnPreferenceChangeListener(this);
+
+        prefNotification = findPreference(NOTIFICATION_PREF_MODE);
 
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object o) {
 
+        if (preference.getKey().equals(getResources().getString(R.string.download_mode_key))) {
+            if (o.equals(false)) {
+                internetPreference.setChecked(false);
+            } else if (o.equals(true)) {
+                internetPreference.setChecked(true);
+            }
+        } else if (preference.getKey().equals(getResources().getString(R.string.timezone_mode_key))) {
+            if (o.equals(false)) {
+                timezonePreference.setChecked(false);
+            } else if (o.equals(true)) {
+                timezonePreference.setChecked(true);
+            }
+        }
         return false;
     }
 
