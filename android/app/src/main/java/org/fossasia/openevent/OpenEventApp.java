@@ -27,7 +27,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import io.branch.referral.Branch;
 import timber.log.Timber;
 
 /**
@@ -79,7 +78,6 @@ public class OpenEventApp extends Application {
             Timber.plant(new CrashReportingTree());
         }
         DbSingleton.init(this);
-        Branch.getAutoInstance(this);
         mapModuleFactory = new MapModuleFactory();
         registerReceiver(new NetworkConnectivityChangeReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         getEventBus().register(this);
