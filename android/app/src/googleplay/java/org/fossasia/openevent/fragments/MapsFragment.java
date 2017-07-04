@@ -2,17 +2,11 @@ package org.fossasia.openevent.fragments;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -29,18 +23,20 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 import org.fossasia.openevent.R;
 import org.fossasia.openevent.data.Event;
 import org.fossasia.openevent.data.Microlocation;
 import org.fossasia.openevent.dbutils.RealmDataRepository;
+import org.fossasia.openevent.utils.map.ClusterRenderer;
 import org.fossasia.openevent.utils.ConstantStrings;
+import org.fossasia.openevent.utils.map.ImageUtils;
+import org.fossasia.openevent.utils.map.MicrolocationClusterWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,12 +48,14 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
     final private String SEARCH = "searchText";
 
     private GoogleMap mMap;
-    private Marker locationMarker;
+    private Marker locationMarker = null;
     private List<String> searchItems = new ArrayList<>();
 
     private RealmDataRepository realmRepo = RealmDataRepository.getDefaultInstance();
-    private List<Microlocation> mLocations = new ArrayList<>();
-    private Map<String, Marker> stringMarkerMap = new HashMap<>();
+    private List<MicrolocationClusterWrapper> mLocations = new ArrayList<>();
+    private ClusterRenderer clusterRenderer;
+    private ClusterManager<MicrolocationClusterWrapper> clusterManager;
+    private Map<String, MicrolocationClusterWrapper> stringMicrolocationClusterWrapperMap = new HashMap<>();
 
     private String searchText = "";
     private boolean isFragmentFromMainActivity = false;
@@ -91,7 +89,9 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         realmRepo.getLocations()
                 .addChangeListener((microlocations, orderedCollectionChangeSet) -> {
                     mLocations.clear();
-                    mLocations.addAll(microlocations);
+                    for(Microlocation microlocation : microlocations) {
+                        mLocations.add(new MicrolocationClusterWrapper(microlocation));
+                    }
                 });
 
         return view;
@@ -99,9 +99,15 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
 
     @Override
     public void onMapReady(GoogleMap map) {
-        if(map != null){
+        if(map != null) {
             mMap = map;
             mMap.getUiSettings().setMapToolbarEnabled(true);
+            clusterManager = new ClusterManager<>(getActivity(), mMap);
+            clusterRenderer = new ClusterRenderer(getActivity(), mMap, clusterManager);
+            mMap.setOnCameraChangeListener(clusterManager);
+            mMap.setOnMarkerClickListener(clusterManager);
+            refreshClusterManager(mLocations);
+            handleClusterEvents();
             showLocationsOnMap();
             showEventLocationOnMap();
         }
@@ -119,44 +125,36 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         String locationTitle = event.getLocationName();
 
         LatLng location = new LatLng(latitude, longitude);
-        handleMarkerEvents(location, locationTitle);
+        locationMarker = mMap.addMarker(new MarkerOptions().position(location).title(locationTitle)
+                    .icon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey)));
     }
 
     private void showLocationsOnMap() {
-        float latitude;
-        float longitude;
-        LatLng location;
-        Marker marker;
         String locationName;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         if(mLocations == null || mLocations.isEmpty())
             return;
 
-        //Add markers for all locations
-        for (Microlocation microlocation : mLocations) {
-            latitude = microlocation.getLatitude();
-            longitude = microlocation.getLongitude();
-            location = new LatLng(latitude, longitude);
-            locationName = microlocation.getName();
+        //Add search names for all locations
+        for (MicrolocationClusterWrapper microlocation : mLocations) {
+            locationName = microlocation.getMicrolocation().getName();
             searchItems.add(locationName);
-
-            marker = handleMarkerEvents(location, locationName);
-            stringMarkerMap.put(locationName,marker);
-            builder.include(marker.getPosition());
+            stringMicrolocationClusterWrapperMap.put(locationName, microlocation);
+            builder.include(microlocation.getPosition());
         }
 
         //Set max zoom level so that all marker are visible
         LatLngBounds bounds = builder.build();
         final CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, dpToPx(40));
-        try{
+        try {
             mMap.moveCamera(cameraUpdate);
-        }catch (IllegalStateException ise){
+        } catch (IllegalStateException ise){
             mMap.setOnMapLoadedCallback(() -> mMap.moveCamera(cameraUpdate));
         }
 
         if (fragmentLocationName != null)
-            focucOnMarker(stringMarkerMap.get(fragmentLocationName));
+            focusOnMarker(fragmentLocationName);
 
         if (searchView == null || mSearchAutoComplete == null)
             return;
@@ -166,9 +164,8 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
 
         mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
             String loc = adapter.getItem(position);
-            int pos = searchItems.indexOf(loc);
 
-            focucOnMarker(stringMarkerMap.get(mLocations.get(pos).getName()));
+            focusOnMarker(loc);
 
             searchView.clearFocus();
 
@@ -180,42 +177,65 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         });
     }
 
-    private void focucOnMarker(Marker marker){
-        marker.showInfoWindow();
-        marker.setIcon(vectorToBitmap(getContext(), R.drawable.map_marker, R.color.color_primary));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), (float) Math.floor(mMap.getCameraPosition().zoom + 8)));
+    private void focusOnMarker(String locationName) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(stringMicrolocationClusterWrapperMap.get(locationName).getPosition(), mMap.getMaxZoomLevel()), new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    Marker marker = stringMicrolocationClusterWrapperMap.get(locationName).getMarker();
+                    if (marker != null) {
+                        locationMarker.setIcon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey));
+                        locationMarker = marker;
+                        marker.showInfoWindow();
+                        marker.setIcon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.color_primary));
+                    }
+                }, 500);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+        Marker marker = stringMicrolocationClusterWrapperMap.get(locationName).getMarker();
+        if (marker != null){
+            marker.showInfoWindow();
+            marker.setIcon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.color_primary));
+        }
     }
 
     private int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    private Marker handleMarkerEvents(LatLng location, String locationTitle) {
-        if (mMap != null) {
-            locationMarker = mMap.addMarker(new MarkerOptions().position(location).title(locationTitle)
-                    .icon(vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey)));
-            mMap.setOnMarkerClickListener(marker -> {
-                locationMarker.setIcon(vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey));
-                locationMarker = marker;
-                marker.setIcon(vectorToBitmap(getContext(), R.drawable.map_marker, R.color.color_primary));
-                return false;
-            });
-            mMap.setOnMapClickListener(latLng -> locationMarker.setIcon(
-                    vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey)));
-        }
-        return locationMarker;
-    }
+    private void handleClusterEvents() {
+        clusterManager.setOnClusterItemClickListener(microlocation -> {
+            if(locationMarker == null) {
+                locationMarker = clusterRenderer.getMarker(microlocation);
+                locationMarker.setIcon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.color_primary));
+            } else {
+                locationMarker.setIcon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey));
+                Marker selectedMarker = clusterRenderer.getMarker(microlocation);
+                selectedMarker.setIcon(ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.color_primary));
+                locationMarker = selectedMarker;
+            }
 
-    private BitmapDescriptor vectorToBitmap(Context context, @DrawableRes int id, int color) {
-        Drawable vectorDrawable = ResourcesCompat.getDrawable(context.getResources(), id, null);
-        assert vectorDrawable != null;
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        DrawableCompat.setTint(vectorDrawable, ContextCompat.getColor(context, color));
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
+            return false;
+        });
+
+        clusterManager.setOnClusterClickListener(cluster -> {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            cluster.getPosition(), (float) Math.floor(mMap
+                                    .getCameraPosition().zoom + 2)), 300,
+                            null);
+
+                    return true;
+                });
+
+        mMap.setOnMapClickListener(latLng -> locationMarker.setIcon(
+                ImageUtils.vectorToBitmap(getContext(), R.drawable.map_marker, R.color.dark_grey)));
+
     }
 
     @Override
@@ -233,6 +253,12 @@ public class MapsFragment extends Fragment implements LocationListener, OnMapRea
         if (mMap != null) {
             mMap.animateCamera(cameraUpdate);
         }
+    }
+
+    private void refreshClusterManager(List<MicrolocationClusterWrapper> items) {
+        clusterManager.clearItems();
+        clusterManager.addItems(items);
+        clusterManager.setRenderer(clusterRenderer);
     }
 
     @Override
