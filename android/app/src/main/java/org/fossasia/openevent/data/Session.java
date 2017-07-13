@@ -8,10 +8,14 @@ import com.github.jasminb.jsonapi.annotations.Id;
 import com.github.jasminb.jsonapi.annotations.Relationship;
 import com.github.jasminb.jsonapi.annotations.Type;
 
+import org.fossasia.openevent.dbutils.RealmClonable;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,7 +26,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.KebabCaseStrategy.class)
-public class Session extends RealmObject {
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
+public class Session extends RealmObject implements RealmClonable<Session> {
 
     /* Sort criteria */
 
@@ -64,4 +69,14 @@ public class Session extends RealmObject {
     private Microlocation microlocation;
     @Relationship("speakers")
     private RealmList<Speaker> speakers;
+
+    @Override
+    public Session realmClone() {
+        return new Session(id, title, subtitle, shortAbstract,
+                longAbstract, comments, startsAt, endsAt,
+                language, slidesUrl, videoUrl, audioUrl,
+                signupUrl, state, level, startDate, isBookmarked,
+                createdAt, deletedAt, submittedAt, isMailSent, sessionType,
+                track, microlocation, speakers);
+    }
 }

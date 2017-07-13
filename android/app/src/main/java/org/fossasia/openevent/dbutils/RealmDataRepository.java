@@ -335,8 +335,13 @@ public class RealmDataRepository {
         return realm.where(Session.class).equalTo("isBookmarked", true).findAllAsync();
     }
 
-    public RealmResults<Session> getBookMarkedSessionsSync() {
-        return realm.where(Session.class).equalTo("isBookmarked", true).findAll();
+    public RealmList<Session> getBookMarkedSessionsSync() {
+        Realm realm = Realm.getDefaultInstance();
+        RealmList<Session> list = new RealmList<>();
+        RealmResults<Session> sessions = realm.where(Session.class).equalTo("isBookmarked", true).findAll();
+        RealmObjectUtils.cloneToRealmList(sessions, list);
+        realm.close();
+        return list;
     }
 
     // Speakers Section
