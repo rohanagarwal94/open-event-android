@@ -70,6 +70,8 @@ public class Session extends RealmObject implements RealmClonable<Session> {
     @Relationship("speakers")
     private RealmList<Speaker> speakers;
 
+    public Session() {}
+
     @Override
     public Session realmClone() {
         return new Session(id, title, subtitle, shortAbstract,
